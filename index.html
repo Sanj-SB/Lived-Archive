@@ -1466,7 +1466,7 @@ width: 100%;
 
 </div>
 
-<button class="btn" onclick="switchPage('review')">Login</button>
+<button class="btn" onclick="handleLoginClick()">Login</button>
 
 </div>
 
@@ -1586,7 +1586,7 @@ width: 100%;
 
 <input type="text" id="customcontentTag" placeholder="Add custom tag">
 
-<button onclick="addCustomTag('content')">Add</button>
+<button onclick="addcustomTag('content')">Add</button>
 
 </div>
 
@@ -1604,7 +1604,7 @@ width: 100%;
 
 <input type="text" id="customformTag" placeholder="Add custom tag">
 
-<button onclick="addCustomTag('form')">Add</button>
+<button onclick="addcustomTag('form')">Add</button>
 
 </div>
 
@@ -1622,7 +1622,7 @@ width: 100%;
 
 <input type="text" id="customuseTag" placeholder="Add custom tag">
 
-<button onclick="addCustomTag('use')">Add</button>
+<button onclick="addcustomTag('use')">Add</button>
 
 </div>
 
@@ -1640,7 +1640,7 @@ width: 100%;
 
 <input type="text" id="customcontextTag" placeholder="Add custom tag">
 
-<button onclick="addCustomTag('context')">Add</button>
+<button onclick="addcustomTag('context')">Add</button>
 
 </div>
 
@@ -1749,7 +1749,29 @@ width: 100%;
 
 </div>
 
-  
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2>Admin Login</h2>
+      <button class="close-modal" onclick="closeLoginModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: grid; gap: 20px;">
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Username</label>
+          <input type="text" id="loginUsername" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Password</label>
+          <input type="password" id="loginPassword" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+        </div>
+        <div id="loginError" style="display: none; color: #c62828; text-align: center;"></div>
+        <button class="btn" onclick="submitLogin()" style="width: 100%;">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 
@@ -1764,7 +1786,9 @@ let pendingArtifacts = [];
 let acceptedArtifacts = [];
 
 let currentArtifactData = null;
-
+let isLoggedIn = false;
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'password123';
   
 
 const tagCategories = {
@@ -2230,8 +2254,8 @@ return 'content';
 
   
 
-window.addCustomTag = function(category) {
-  const inputId = `custom${category.charAt(0).toUpperCase() + category.slice(1)}Tag`;
+window.addcustomTag = function(category) {
+  const inputId = `custom${category}Tag`;
   const input = document.getElementById(inputId);
   const tagText = input.value.trim();
   if (tagText) {
@@ -2265,7 +2289,7 @@ if (e.key === 'Enter') {
 
 const category = this.id.replace('custom', '').replace('Tag', '').toLowerCase();
 
-addCustomTag(category);
+addcustomTag(category);
 
 }
 
@@ -2692,6 +2716,11 @@ return card;
 
 }
 
+document.getElementById('loginModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeLoginModal();
+  }
+});
   
 
 function loadArchive() {
@@ -2950,6 +2979,55 @@ document.getElementById('artifactModal').classList.remove('active');
 
 };
 
+window.handleLoginClick = function() {
+  if (isLoggedIn) {
+    switchPage('review');
+  } else {
+    document.getElementById('loginModal').classList.add('active');
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').style.display = 'none';
+  }
+};
+
+window.submitLogin = function() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  const errorDiv = document.getElementById('loginError');
+  
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    isLoggedIn = true;
+    closeLoginModal();
+    switchPage('review');
+  } else {
+    errorDiv.textContent = 'Invalid username or password';
+    errorDiv.style.display = 'block';
+  }
+};
+
+window.closeLoginModal = function() {
+  document.getElementById('loginModal').classList.remove('active');
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  const loginPassword = document.getElementById('loginPassword');
+  if (loginPassword) {
+    loginPassword.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        submitLogin();
+      }
+    });
+  }
+  
+  const loginUsername = document.getElementById('loginUsername');
+  if (loginUsername) {
+    loginUsername.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        submitLogin();
+      }
+    });
+  }
+});
   
 
 document.getElementById('artifactModal').addEventListener('click', function(e) {
