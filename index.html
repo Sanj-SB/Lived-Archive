@@ -2140,8 +2140,10 @@ function toggleTag(element, tagText) {
   } else {
     selectedTags.delete(tagText);
   }
+  console.log('Selected tags:', Array.from(selectedTags)); // Debug line
+  console.log('Selected tags count:', selectedTags.size); // Debug line
   updateSelectedSummary();
-  checkSubmitReady(); // Add this line to check if submit button should appear
+  checkSubmitReady();
 }
 
   
@@ -2175,7 +2177,6 @@ document.getElementById('submitSection').classList.remove('active');
 }
 
   
-
 function checkSubmitReady() {
   const title = document.getElementById('artifactTitle').value.trim();
   const date = document.getElementById('artifactDate').value.trim();
@@ -2184,13 +2185,16 @@ function checkSubmitReady() {
   const description = document.getElementById('artifactDescription').value.trim();
   const submitSection = document.getElementById('submitSection');
   
+  console.log('Check submit - Tags:', selectedTags.size, 'Title:', !!title, 'Date:', !!date, 'Creator:', !!creator, 'Purpose:', !!purpose, 'Desc:', !!description);
+  
   if (selectedTags.size > 0 && title && date && creator && purpose && description) {
+    console.log('SHOWING SUBMIT BUTTON');
     submitSection.classList.add('active');
   } else {
+    console.log('HIDING SUBMIT BUTTON');
     submitSection.classList.remove('active');
   }
 }
-
 
   
 
