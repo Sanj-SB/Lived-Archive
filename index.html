@@ -4774,35 +4774,6 @@ audioDataURL: null
 
 const promises = [];
 
-  
-
-if (artifact.submitter) {
-
-contentHTML += `
-
-<div class="artifact-section">
-
-<h3>Submitted By</h3>
-
-<div class="artifact-text">
-
-<strong>Name:</strong> ${artifact.submitter.name}<br>
-
-<strong>Email:</strong> ${artifact.submitter.email}<br>
-
-<strong>Designation:</strong> ${artifact.submitter.designation}
-
-</div>
-
-</div>
-
-`;
-
-}
-
-  
-
-  
 
 if (selectedVisualFile) {
 
@@ -5602,6 +5573,29 @@ contentHTML += `
 
   
 
+if (artifact.submitter) {
+
+contentHTML += `
+
+<div class="artifact-section">
+
+<h3>Submitted By</h3>
+
+<div class="artifact-text">
+
+<strong>Name:</strong> ${artifact.submitter.name}<br>
+
+<strong>Email:</strong> ${artifact.submitter.email}<br>
+
+<strong>Designation:</strong> ${artifact.submitter.designation}
+
+</div>
+
+</div>
+
+`;
+
+}
   
 
 if (isPending) {
