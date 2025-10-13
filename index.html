@@ -1520,11 +1520,13 @@ border-color: #4a5268;
 
   
 
-background: #fff3e0;
+background: #e0e0e0;
 
   
 
-border-color: #ff9800;
+border-color: #4a5268;
+
+border-style: dotted;
 
   
 
@@ -1538,11 +1540,13 @@ border-color: #ff9800;
 
   
 
-background: #ff9800;
+background: #4a5268;
 
   
 
 color: white;
+
+border-color: #4a5268;
 
   
 
@@ -2752,7 +2756,7 @@ width: 100%;
 
   
 
-<p>An Archive of lived realities; for the people, by the people, and of the people.</p>
+<p>An Archive of lived realities; of the people, for the people, by the people.</p>
 
   
 
@@ -2896,11 +2900,11 @@ width: 100%;
 
   
 
-<button class="btn" id="generateBtn" onclick="generateTags()">Generate Tags</button>
+<button class="btn" id="generateBtn" onclick="generateTags()">Start Tagging</button>
 
   
 
-<div id="loadingMsg">Generating tags...</div>
+<div id="loadingMsg">Curating tags...</div>
 
   
 
@@ -2920,11 +2924,30 @@ width: 100%;
 
 <!-- Results Section (Tags) -->
 
-  
+<h4>Pick tags from each section that work best for your artifact!</h4>
 
 <div id="resultsSection" class="results-section">
 
-  
+<div class="legend">
+
+<div class="legend-item">
+
+<div class="legend-box"></div>
+
+<span>General Tags</span>
+
+</div>
+
+<div class="legend-item">
+
+<div class="legend-box ai"></div>
+
+<span>AI Suggested Tags</span>
+
+</div>
+
+</div>
+
 
 <div class="tag-category">
 
@@ -2998,7 +3021,7 @@ width: 100%;
 
   
 
-<h3>Use Tags</h3>
+<h3>Use Case Tags</h3>
 
   
 
@@ -3032,7 +3055,7 @@ width: 100%;
 
   
 
-<h3>Context Tags</h3>
+<h3>Contextual Tags</h3>
 
   
 
@@ -3062,31 +3085,6 @@ width: 100%;
 
 </div>
 
-  
-
-  
-
-<!-- Selected Summary -->
-
-  
-
-<div id="selectedSummary" class="selected-summary">
-
-  
-
-<h3>Selected Tags: <span id="selectedCount">0</span></h3>
-
-  
-
-</div>
-
-  
-
-  
-
-<!-- Description Section -->
-
-  
 
 <!-- Description Section -->
 
@@ -3098,7 +3096,7 @@ width: 100%;
 
 <div>
 
-<label style="display: block; margin-bottom: 8px; font-weight: bold;">Title *</label>
+<label style="display: block; margin-bottom: 8px; font-weight: bold;">Artifact Title *</label>
 
 <input type="text" id="artifactTitle" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
 
@@ -3106,7 +3104,7 @@ width: 100%;
 
 <div>
 
-<label style="display: block; margin-bottom: 8px; font-weight: bold;">Date Created *</label>
+<label style="display: block; margin-bottom: 8px; font-weight: bold;">When was the artifact created? *</label>
 
 <input type="date" id="artifactDate" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
 
@@ -3114,7 +3112,7 @@ width: 100%;
 
 <div>
 
-<label style="display: block; margin-bottom: 8px; font-weight: bold;">Created By *</label>
+<label style="display: block; margin-bottom: 8px; font-weight: bold;">Who created the artifact? *</label>
 
 <input type="text" id="artifactCreator" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
 
@@ -3124,7 +3122,7 @@ width: 100%;
 
 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Why It Was Created *</label>
 
-<textarea id="artifactPurpose" style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
+<textarea id="artifactPurpose" placeholder="Explain the purpose of this artifact, in what context it was made, was it personal, activist work or something entirely different?" style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
 
 </div>
 
@@ -3132,7 +3130,7 @@ width: 100%;
 
 <label style="display: block; margin-bottom: 8px; font-weight: bold;">General Description *</label>
 
-<textarea id="artifactDescription" style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
+<textarea id="artifactDescription" placeholder="This artifact is about... Talk about where it came from, did you get it from somewhere OR make it yourself? Why is it important for it to exist?" style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
 
 </div>
 
@@ -3166,7 +3164,7 @@ width: 100%;
 
 </div>
 
-  
+
 
 </div>
 
@@ -5213,7 +5211,7 @@ ctaCard.innerHTML = `
 
   
 
-<p>Have a story that matters, piece of history that should remain permanent? Send it in and join the Lived Archive on your own terms.</p>
+<p>Have a story that matters, a piece of history that should remain permanent? Send it in and join the Lived Archive on your own terms.</p>
 
   
 
