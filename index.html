@@ -3676,7 +3676,57 @@ context: [
 };
 
   
+// Sample artifacts for demonstration
+const sampleArtifacts = [
+  {
+    title: "Slum Jaggathu, edition 220",
+    tags: ["Print Publication (Magazine, Pamphlet, Zine)", "Alternative News / Reporting", "Media & Representation", "Education & Literacy"],
+    timestamp: "2025-12-31",
+    visualFile: null,
+    audioFile: null,
+    textContent: "Sample publication content",
+    description: "A community publication highlighting local issues and stories."
+  },
+  {
+    title: "Hidden Hunger in Plain Sight, Ambedkarian Chronicles",
+    tags: ["Text (Article, Essay, Letter)", "Resistance & Protest", "Awareness / Advocacy", "Social Justice"],
+    timestamp: "2025-11-15",
+    visualFile: null,
+    audioFile: null,
+    textContent: "Sample article content",
+    description: "An article exploring food insecurity and social justice."
+  },
+  {
+    title: "I Brought Ambedkar Home, Ambedkarian Chronicles",
+    tags: ["Oral Histories / Personal Narratives", "Text (Article, Essay, Letter)", "Memory & Commemoration", "Culture & Heritage"],
+    timestamp: "2025-10-20",
+    visualFile: null,
+    audioFile: null,
+    textContent: "Sample narrative content",
+    description: "A personal narrative about cultural heritage and identity."
+  },
+  {
+    title: "Arc.Bangalore",
+    tags: ["Community Organizing", "Social Media Post (Instagram, WhatsApp, Twitter, etc.)", "Awareness / Advocacy", "Urban Life & Infrastructure"],
+    timestamp: "2025-09-10",
+    visualFile: null,
+    audioFile: null,
+    textContent: "Sample social media content",
+    description: "Community organizing initiative in Bangalore."
+  },
+  {
+    title: "Studying Gender Without Caste Does the Subject a Disservice, The Wire",
+    tags: ["Text (Article, Essay, Letter)", "Awareness / Advocacy", "Social Justice", "Caste & Marginalization"],
+    timestamp: "2025-08-05",
+    visualFile: null,
+    audioFile: null,
+    textContent: "Sample article content",
+    description: "An analysis of intersectionality in academic discourse."
+  }
+];
 
+// Load sample artifacts on initial page load (comment out this line if you don't want sample data)
+//acceptedArtifacts = [...sampleArtifacts];//
   
 
 document.getElementById('fileInput').addEventListener('change', handleVisualFileSelect);
@@ -5171,18 +5221,17 @@ resetInputs();
   
 
 window.switchPage = function(pageName) {
-
-  
-
-document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
-  
-
-if (pageName === 'home') {
-
-  
-
-document.getElementById('homePage').classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (pageName === 'home') {
+    document.getElementById('homePage').classList.add('active');
+    loadArchive(); // This line should remain
+  } else if (pageName === 'submit') {
+    document.getElementById('submitPage').classList.add('active');
+  } else if (pageName === 'review') {
+    document.getElementById('reviewPage').classList.add('active');
+    loadReviewQueue();
+  }
+};
 
   
 
@@ -5202,13 +5251,7 @@ function loadArchive() {
   setupFilters(nodes);
 }
 
-  
 
-};
-
-  
-
-  
 
 function loadReviewQueue() {
 
@@ -5378,217 +5421,6 @@ closeLoginModal();
 
 });
 
-  
-
-function loadArchive() {
-
-  
-
-const artifactsGrid = document.getElementById('homeArtifactsGrid');
-
-  
-
-artifactsGrid.innerHTML = '';
-
-  
-
-  
-
-// Add CTA card
-
-  
-
-const ctaCard = document.createElement('div');
-
-  
-
-ctaCard.className = 'cta-card';
-
-  
-
-ctaCard.innerHTML = `
-
-  
-
-<div>
-
-  
-
-<h2>Be a part of the archive!</h2>
-
-  
-
-<p>Have a story that matters, piece of history that should remain permanent? Send it in and join the Lived Archive on your own terms.</p>
-
-  
-
-</div>
-
-  
-
-<button class="btn" onclick="showUserInfoModal()">Submit Artifact</button>
-
-  
-
-`;
-
-  
-
-artifactsGrid.appendChild(ctaCard);
-
-  
-
-  
-
-if (acceptedArtifacts.length === 0) {
-
-  
-
-// Add placeholder cards
-
-  
-
-for (let i = 0; i < 6; i++) {
-
-  
-
-const placeholderCard = document.createElement('div');
-
-  
-
-placeholderCard.className = 'artifact-card';
-
-  
-
-placeholderCard.innerHTML = `
-
-  
-
-<div class="artifact-card-image"></div>
-
-  
-
-<div class="artifact-card-content">
-
-  
-
-<h3>Title</h3>
-
-  
-
-<div class="artifact-tags">
-
-  
-
-<span class="tag">Tags</span>
-
-  
-
-<span class="tag">Tags</span>
-
-  
-
-<span class="tag">Tags</span>
-
-  
-
-</div>
-
-  
-
-</div>
-
-  
-
-`;
-
-  
-
-artifactsGrid.appendChild(placeholderCard);
-
-  
-
-}
-
-  
-
-} else {
-
-  
-
-acceptedArtifacts.forEach((artifact, index) => {
-
-  
-
-const card = document.createElement('div');
-
-  
-
-card.className = 'artifact-card';
-
-  
-
-let imageHTML = '';
-
-  
-
-if (artifact.visualDataURL && artifact.visualFile.type.startsWith('image/')) {
-
-  
-
-imageHTML = `<div class="artifact-card-image"><img src="${artifact.visualDataURL}" alt="Artifact"></div>`;
-
-  
-
-} else {
-
-  
-
-imageHTML = `<div class="artifact-card-image"></div>`;
-
-  
-
-}
-
-  
-
-card.innerHTML = `
-
-${imageHTML}
-
-<div class="artifact-card-content">
-
-<h3>${artifact.title || 'Untitled Artifact'}</h3>
-
-<div class="artifact-tags">
-
-${artifact.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}
-
-</div>
-
-</div>
-
-`;
-
-  
-
-card.onclick = () => viewArtifactDetails(index, false);
-
-  
-
-artifactsGrid.appendChild(card);
-
-  
-
-});
-
-  
-
-}
-
-  
-
-}
 
   
 
@@ -6307,7 +6139,6 @@ window.resetZoom = function() {
   svg.transition().call(zoom.transform, d3.zoomIdentity);
 };
   
-}
 
 </script>
 
