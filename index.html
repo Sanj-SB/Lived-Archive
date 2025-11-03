@@ -5370,16 +5370,10 @@ card.style.marginBottom = '30px';
 
 let imageHTML = '';
 
-  
 
-if (artifact.visualDataURL && artifact.visualFile.type.startsWith('image/')) {
 
-  
-
-imageHTML = `<div class="artifact-card-image"><img src="${artifact.visualDataURL}" alt="Artifact"></div>`;
-
-  
-
+if (artifact.visualDataURL && artifact.visualFile && artifact.visualFile.type.startsWith('image/')) {
+  imageHTML = `<div class="artifact-card-image"><img src="${artifact.visualDataURL}" alt="Artifact"></div>`;
 } else {
 
   
@@ -5420,7 +5414,7 @@ return card;
 
   
 
-}
+
 
   
 
@@ -5461,64 +5455,22 @@ let contentHTML = '';
 
   
 
+
 if (artifact.visualDataURL) {
-
-  
-
-if (artifact.visualFile.type.startsWith('image/')) {
-
-  
-
-contentHTML += `
-
-  
-
-<div class="artifact-section">
-
-  
-
-<img src="${artifact.visualDataURL}" class="artifact-image" alt="Artifact image">
-
-  
-
-</div>
-
-  
-
-`;
-
-  
-
-} else if (artifact.visualFile.type === 'application/pdf') {
-
-  
-
-contentHTML += `
-
-  
-
-<div class="artifact-section">
-
-  
-
-<iframe src="${artifact.visualDataURL}" class="artifact-pdf" title="PDF Document"></iframe>
-
-  
-
-</div>
-
-  
-
-`;
-
-  
-
+  if (artifact.visualFile && artifact.visualFile.type.startsWith('image/')) {
+    contentHTML += `
+      <div class="artifact-section">
+        <img src="${artifact.visualDataURL}" class="artifact-image" alt="Artifact image">
+      </div>
+    `;
+  } else if (artifact.visualFile && artifact.visualFile.type === 'application/pdf') {
+    contentHTML += `
+      <div class="artifact-section">
+        <iframe src="${artifact.visualDataURL}" class="artifact-pdf" title="PDF Document"></iframe>
+      </div>
+    `;
+  }
 }
-
-  
-
-}
-
   
 
   
@@ -6153,6 +6105,8 @@ window.resetZoom = function() {
   svg.transition().call(zoom.transform, d3.zoomIdentity);
 };
   
+
+}
 
 </script>
 
