@@ -3829,30 +3829,44 @@ if (!document.getElementById('textInput').value.trim()) {
 
 resetInputs();
 
+
+}
+  
+
+}
+
+  
+
+}
+
 function artifactToNode(artifact, id) {
   // Extract categories from tags
   const categories = new Set();
   
   artifact.tags.forEach(tag => {
-    // Determine category based on tag
-    if (['Social Justice', 'Caste & Marginalization', 'Labor & Workers\' Rights', 
-         'Gender & Sexuality', 'Grievances', 'Resistance & Protest'].some(c => tag.includes(c))) {
-      categories.add('Social Issues & Rights');
-    }
-    if (['Education & Literacy', 'Health & Wellbeing'].some(c => tag.includes(c))) {
-      categories.add('Education and Wellbeing');
-    }
-    if (['Culture & Heritage', 'Theatre & Performance', 'Music & Folk Traditions', 
-         'Language & Linguistics', 'Media & Representation'].some(c => tag.includes(c))) {
-      categories.add('Culture, Heritage & Expression');
-    }
-    if (['Urban Life & Infrastructure', 'Community Organizing'].some(c => tag.includes(c))) {
-      categories.add('Community & Urban Life');
-    }
-    if (['Alternative News / Reporting'].some(c => tag.includes(c))) {
-      categories.add('Media & Communication');
-    }
-  });
+  if (['Social Justice', 'Caste & Marginalization', 'Labor & Workers\' Rights', 
+       'Gender & Sexuality', 'Migration & Displacement', 'Resistance & Protest'].some(c => tag.includes(c))) {
+    categories.add('Social Issues & Rights');
+  }
+  if (['Education & Literacy', 'Health & Wellbeing', 'Awareness / Advocacy', 'Educational Resource'].some(c => tag.includes(c))) {
+    categories.add('Education and Wellbeing');
+  }
+  if (['Politics & Policy', 'Political Campaigning', 'Community Mobilization', 
+       'Protest Documentation', 'Alternative News / Reporting'].some(c => tag.includes(c))) {
+    categories.add('Politics, Policy & Activism');
+  }
+  if (['Religion & Spirituality', 'Culture & Heritage', 'Memory & Commemoration', 
+       'Theatre & Performance', 'Music & Folk Traditions', 'Language & Linguistics',
+       'Artistic Practice', 'Cultural Expression', 'Storytelling / Oral Tradition'].some(c => tag.includes(c))) {
+    categories.add('Culture, Heritage & Expression');
+  }
+  if (['Community Organizing', 'Urban Life & Infrastructure', 'Collective Organizing Tool'].some(c => tag.includes(c))) {
+    categories.add('Community & Urban Life');
+  }
+  if (['Media & Representation', 'Knowledge Sharing', 'Archival / Documentation'].some(c => tag.includes(c))) {
+    categories.add('Media & Communication');
+  }
+});
   
   if (categories.size === 0) categories.add('Other');
   
@@ -3888,18 +3902,7 @@ function generateLinks(nodes) {
     }
   }
   return links;
-}
-
-}
-  
-
-}
-
-  
-
-}
-
-  
+}  
 
   
 
@@ -6039,6 +6042,7 @@ function getCategoryColor(category) {
   const colors = {
     'Social Issues & Rights': '#e74c3c',
     'Education and Wellbeing': '#3498db',
+    'Politics, Policy & Activism': '#e67e22',  // ADD THIS LINE
     'Culture, Heritage & Expression': '#9b59b6',
     'Community & Urban Life': '#2ecc71',
     'Media & Communication': '#f39c12',
