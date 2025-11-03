@@ -5412,25 +5412,9 @@ card.onclick = () => viewArtifactDetails(index, true);
 
 return card;
 
-  
-
-
+}  
 
   
-
-document.getElementById('loginModal').addEventListener('click', function(e) {
-
-if (e.target === this) {
-
-closeLoginModal();
-
-}
-
-});
-
-
-  
-
   
 
 window.viewArtifactDetails = function(index, isPending = false) {
@@ -5766,6 +5750,12 @@ submitLogin();
 });
 
 }
+
+document.getElementById('loginModal').addEventListener('click', function(e) {
+if (e.target === this) {
+closeLoginModal();
+}
+});
 
 const loginUsername = document.getElementById('loginUsername');
 
@@ -6105,8 +6095,6 @@ window.resetZoom = function() {
   svg.transition().call(zoom.transform, d3.zoomIdentity);
 };
   
-
-}
 
 </script>
 
