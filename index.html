@@ -5261,24 +5261,6 @@ window.switchPage = function(pageName) {
   }
 };
 
-  
-
-function loadArchive() {
-  if (acceptedArtifacts.length === 0) {
-    const svg = document.getElementById('networkGraph');
-    svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#999" font-size="18" font-family="Georgia, serif">No artifacts in archive yet. Submit one to get started!</text>';
-    return;
-  }
-  
-  const nodes = acceptedArtifacts.map((artifact, index) => 
-    artifactToNode(artifact, `artifact${index}`)
-  );
-  const links = generateLinks(nodes);
-  
-  initializeGraph(nodes, links);
-  setupFilters(nodes);
-}
-
 
 
 function loadReviewQueue() {
