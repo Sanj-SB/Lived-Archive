@@ -3095,7 +3095,7 @@ width: 100%;
 
   
 
-<button onclick="addcustomTag('content')">Add</button>
+<button onclick="addCustomTag('content')">Add</button>
 
   
 
@@ -3129,7 +3129,7 @@ width: 100%;
 
   
 
-<button onclick="addcustomTag('form')">Add</button>
+<button onclick="addCustomTag('form')">Add</button>
 
   
 
@@ -3163,7 +3163,7 @@ width: 100%;
 
   
 
-<button onclick="addcustomTag('use')">Add</button>
+<button onclick="addCustomTag('use')">Add</button>
 
   
 
@@ -3197,7 +3197,7 @@ width: 100%;
 
   
 
-<button onclick="addcustomTag('context')">Add</button>
+<button onclick="addCustomTag('context')">Add</button>
 
   
 
@@ -3726,7 +3726,35 @@ const sampleArtifacts = [
 ];
 
 // Load sample artifacts on initial page load (comment out this line if you don't want sample data)
-//acceptedArtifacts = [...sampleArtifacts];
+acceptedArtifacts = [...sampleArtifacts];
+
+// Add this after the sample artifacts array
+function loadSampleData() {
+  if (acceptedArtifacts.length === 0) {
+    acceptedArtifacts = [...sampleArtifacts];
+    loadArchive();
+  }
+}
+
+// Then modify the empty state message in loadArchive to include a button
+function loadArchive() {
+  if (acceptedArtifacts.length === 0) {
+    const svg = document.getElementById('networkGraph');
+    svg.innerHTML = `
+      <text x="50%" y="45%" text-anchor="middle" fill="#999" font-size="18" font-family="Georgia, serif">No artifacts in archive yet.</text>
+      <text x="50%" y="55%" text-anchor="middle" fill="#4a5268" font-size="14" font-family="Georgia, serif" style="cursor: pointer;" onclick="loadSampleData()">Click here to load sample data</text>
+    `;
+    return;
+  }
+  
+  const nodes = acceptedArtifacts.map((artifact, index) => 
+    artifactToNode(artifact, `artifact${index}`)
+  );
+  const links = generateLinks(nodes);
+  
+  initializeGraph(nodes, links);
+  setupFilters(nodes);
+}
   
 
 document.getElementById('fileInput').addEventListener('change', handleVisualFileSelect);
@@ -4621,7 +4649,7 @@ const category = this.id.replace('custom', '').replace('Tag', '').toLowerCase();
 
   
 
-addcustomTag(category);
+addCustomTag(category);
 
   
 
