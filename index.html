@@ -3238,7 +3238,6 @@ width: 100%;
   
 
 <!-- Description Section -->
-
 <div id="descriptionSection" class="description-section">
 
 <h3>Artifact Details</h3>
@@ -3704,7 +3703,7 @@ const sampleArtifacts = [
   {
     title: "Arc.Bangalore",
     tags: ["Community Organizing", "Social Media Post (Instagram, WhatsApp, Twitter, etc.)", "Awareness / Advocacy", "Urban Life & Infrastructure"],
-    timestamp: "2025-09-10",
+    timestamp: "2G025-09-10",
     format: "text",
     textContent: "Sample social media content",
     description: "Community organizing initiative in Bangalore."
@@ -3728,14 +3727,21 @@ function loadSampleData() {
   loadArchive();
 }
 
+// --- START OF FIX ---
+// This is the updated loadArchive function
 function loadArchive() {
-  const container = document.getElementById('networkGraph');
+  // Get the parent div for dimensions
+  const container = document.getElementById('graphView'); 
+  // Get the SVG element to draw on
+  const svgElement = document.getElementById('networkGraph'); 
   
   if (acceptedArtifacts.length === 0) {
     d3.select('#networkGraph').selectAll('*').remove();
     
-    const svg = d3.select('#networkGraph')
-      .attr('width', container.clientWidth)
+    // Select the SVG element
+    const svg = d3.select(svgElement)
+      // Use the PARENT'S width and height
+      .attr('width', container.clientWidth) 
       .attr('height', container.clientHeight);
     
     svg.append('text')
@@ -3769,6 +3775,7 @@ function loadArchive() {
   initializeGraph(nodes, links);
   setupFilters(nodes);
 }
+// --- END OF FIX ---
   
 
 document.getElementById('fileInput').addEventListener('change', handleVisualFileSelect);
@@ -5909,17 +5916,21 @@ closeUserInfoModal();
 
 loadArchive();
 
+// --- START OF FIX ---
+// This is the updated initializeGraph function
 function initializeGraph(nodes, links) {
-  const container = document.getElementById('networkGraph');
+  // Get the PARENT div for dimensions
+  const container = document.getElementById('graphView'); 
   const width = container.clientWidth;
   const height = container.clientHeight;
   
   // Clear existing
   d3.select('#networkGraph').selectAll('*').remove();
   
+  // Select the SVG element
   svg = d3.select('#networkGraph')
-    .attr('width', width)
-    .attr('height', height);
+    .attr('width', width) // Set width from parent
+    .attr('height', height); // Set height from parent
   
   // Add zoom behavior
   zoom = d3.zoom()
@@ -5995,6 +6006,8 @@ function initializeGraph(nodes, links) {
     d.fy = null;
   }
 }
+// --- END OF FIX ---
+
 
 function getCategoryColor(category) {
   const colors = {
