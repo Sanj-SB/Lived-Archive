@@ -3676,14 +3676,12 @@ context: [
 };
 
   
-// Sample artifacts for demonstration
 const sampleArtifacts = [
   {
     title: "Slum Jaggathu, edition 220",
     tags: ["Print Publication (Magazine, Pamphlet, Zine)", "Alternative News / Reporting", "Media & Representation", "Education & Literacy"],
     timestamp: "2025-12-31",
-    visualFile: null,
-    audioFile: null,
+    format: "text",
     textContent: "Sample publication content",
     description: "A community publication highlighting local issues and stories."
   },
@@ -3691,8 +3689,7 @@ const sampleArtifacts = [
     title: "Hidden Hunger in Plain Sight, Ambedkarian Chronicles",
     tags: ["Text (Article, Essay, Letter)", "Resistance & Protest", "Awareness / Advocacy", "Social Justice"],
     timestamp: "2025-11-15",
-    visualFile: null,
-    audioFile: null,
+    format: "text",
     textContent: "Sample article content",
     description: "An article exploring food insecurity and social justice."
   },
@@ -3700,8 +3697,7 @@ const sampleArtifacts = [
     title: "I Brought Ambedkar Home, Ambedkarian Chronicles",
     tags: ["Oral Histories / Personal Narratives", "Text (Article, Essay, Letter)", "Memory & Commemoration", "Culture & Heritage"],
     timestamp: "2025-10-20",
-    visualFile: null,
-    audioFile: null,
+    format: "text",
     textContent: "Sample narrative content",
     description: "A personal narrative about cultural heritage and identity."
   },
@@ -3709,8 +3705,7 @@ const sampleArtifacts = [
     title: "Arc.Bangalore",
     tags: ["Community Organizing", "Social Media Post (Instagram, WhatsApp, Twitter, etc.)", "Awareness / Advocacy", "Urban Life & Infrastructure"],
     timestamp: "2025-09-10",
-    visualFile: null,
-    audioFile: null,
+    format: "text",
     textContent: "Sample social media content",
     description: "Community organizing initiative in Bangalore."
   },
@@ -3718,8 +3713,7 @@ const sampleArtifacts = [
     title: "Studying Gender Without Caste Does the Subject a Disservice, The Wire",
     tags: ["Text (Article, Essay, Letter)", "Awareness / Advocacy", "Social Justice", "Caste & Marginalization"],
     timestamp: "2025-08-05",
-    visualFile: null,
-    audioFile: null,
+    format: "text",
     textContent: "Sample article content",
     description: "An analysis of intersectionality in academic discourse."
   }
@@ -5060,29 +5054,31 @@ combinedDescription += `\n\nURL: ${url}`;
 
 }
 
+// Determine format
+let format = "text";
+if (selectedAudioFile) {
+  format = "audio";
+} else if (selectedVisualFile) {
+  if (selectedVisualFile.type.startsWith('image/')) {
+    format = "image";
+  } else if (selectedVisualFile.type === 'application/pdf') {
+    format = "pdf";
+  }
+}
+
 currentArtifactData = {
-
 tags: tagsArray,
-
 title: title,
-
 description: combinedDescription,
-
 submitter: currentSubmitterInfo,
-
 timestamp: new Date().toISOString(),
-
+format: format,
 textContent: textContent,
-
 visualFile: selectedVisualFile,
-
 audioFile: selectedAudioFile,
-
 visualDataURL: null,
-
 audioDataURL: null
-
-};
+}; 
 
   
 
@@ -6036,12 +6032,10 @@ function hideTooltip() {
 }
 
 function getFormatIcon(artifact) {
-  if (artifact.audioFile) return '🎵 Audio';
-  if (artifact.visualFile) {
-    if (artifact.visualFile.type.startsWith('image/')) return '🖼️ Image';
-    if (artifact.visualFile.type === 'application/pdf') return '📄 PDF';
-  }
-  if (artifact.textContent) return '📝 Text';
+  if (artifact.format === 'audio') return '🎵 Audio';
+  if (artifact.format === 'image') return '🖼️ Image';
+  if (artifact.format === 'pdf') return '📄 PDF';
+  if (artifact.format === 'text' || artifact.textContent) return '📝 Text';
   return '📋 Document';
 }
 
