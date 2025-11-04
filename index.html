@@ -3725,25 +3725,45 @@ const sampleArtifacts = [
   }
 ];
 
-// Load sample artifacts on initial page load (comment out this line if you don't want sample data)
+// Initialize with sample data
 acceptedArtifacts = [...sampleArtifacts];
 
 // Add this after the sample artifacts array
 function loadSampleData() {
-  if (acceptedArtifacts.length === 0) {
-    acceptedArtifacts = [...sampleArtifacts];
-    loadArchive();
-  }
+  acceptedArtifacts = [...sampleArtifacts];
+  loadArchive();
 }
 
-// Then modify the empty state message in loadArchive to include a button
 function loadArchive() {
+  const container = document.getElementById('networkGraph');
+  
   if (acceptedArtifacts.length === 0) {
-    const svg = document.getElementById('networkGraph');
-    svg.innerHTML = `
-      <text x="50%" y="45%" text-anchor="middle" fill="#999" font-size="18" font-family="Georgia, serif">No artifacts in archive yet.</text>
-      <text x="50%" y="55%" text-anchor="middle" fill="#4a5268" font-size="14" font-family="Georgia, serif" style="cursor: pointer;" onclick="loadSampleData()">Click here to load sample data</text>
-    `;
+    d3.select('#networkGraph').selectAll('*').remove();
+    
+    const svg = d3.select('#networkGraph')
+      .attr('width', container.clientWidth)
+      .attr('height', container.clientHeight);
+    
+    svg.append('text')
+      .attr('x', '50%')
+      .attr('y', '45%')
+      .attr('text-anchor', 'middle')
+      .attr('fill', '#999')
+      .attr('font-size', '18')
+      .attr('font-family', 'Georgia, serif')
+      .text('No artifacts in archive yet.');
+    
+    svg.append('text')
+      .attr('x', '50%')
+      .attr('y', '55%')
+      .attr('text-anchor', 'middle')
+      .attr('fill', '#4a5268')
+      .attr('font-size', '14')
+      .attr('font-family', 'Georgia, serif')
+      .style('cursor', 'pointer')
+      .text('Click here to load sample data')
+      .on('click', loadSampleData);
+    
     return;
   }
   
