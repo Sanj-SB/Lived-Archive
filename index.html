@@ -2894,7 +2894,7 @@ width: 100%;
 
 
  <!-- Home Page (Archive) -->
-<div id="homePage" class.page.active">
+<div id="homePage" class="page active">
   <div class="home-header">
     <div class="date-text">October 10, 2025</div>
     <h1>Lived Archive</h1>
@@ -5963,8 +5963,8 @@ function initializeGraph(nodes, links) {
       .on('start', dragstarted)
       .on('drag', dragged)
       .on('end', dragended))
-    .on('mouseover', nodeMouseOver) // --- HOVER FIX ---
-    .on('mouseout', nodeMouseOut) // --- HOVER FIX ---
+    .on('mouseover', nodeMouseOver)
+    .on('mouseout', nodeMouseOut) 
     .on('click', (event, d) => {
       const index = acceptedArtifacts.findIndex(a => a.title === d.label);
       if (index !== -1) viewArtifactDetails(index, false);
@@ -5987,17 +5987,24 @@ function initializeGraph(nodes, links) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
+    // --- RIGIDITY FIX: Manually trigger hover-in logic ---
+    d3.select(this).transition().duration(150).attr('r', 25).attr('stroke-width', 5).style('stroke', '#4a5268');
   }
   
   function dragged(event, d) {
     d.fx = event.x;
     d.fy = event.y;
+    // --- RIGIDITY FIX: Make tooltip follow drag ---
+    showTooltip(event, d);
   }
   
   function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+    // --- RIGIDITY FIX: Manually trigger hover-out logic ---
+    d3.select(this).transition().duration(150).attr('r', 20).attr('stroke-width', 3).style('stroke', '#fff');
+    hideTooltip();
   }
 }
 
@@ -6015,17 +6022,32 @@ function getCategoryColor(category) {
   return colors[category] || colors['Other'];
 }
 
-// --- START OF TOOLTIP/HOVER FIX ---
+// --- START OF TOOLTIP/HOVER REFACTOR ---
+
+// This function just handles the styling
 function nodeMouseOver(event, d) {
-  // 1. Style the node
   d3.select(this)
     .transition()
     .duration(150)
     .attr('r', 25) // Enlarge the node
     .attr('stroke-width', 5)
     .style('stroke', '#4a5268');
+  showTooltip(event, d);
+}
 
-  // 2. Show the tooltip
+// This function just handles the styling
+function nodeMouseOut(event, d) {
+  d3.select(this)
+    .transition()
+    .duration(150)
+    .attr('r', 20) // Return to base radius
+    .attr('stroke-width', 3)
+    .style('stroke', '#fff'); // Return to base stroke
+  hideTooltip();
+}
+
+// This function just shows and positions the tooltip
+function showTooltip(event, d) {
   const tooltip = document.getElementById('nodeTooltip');
   const formatIcon = getFormatIcon(d.artifact);
   
@@ -6050,19 +6072,11 @@ function nodeMouseOver(event, d) {
   tooltip.classList.add('active');
 }
 
-function nodeMouseOut(event, d) {
-  // 1. Reset node style
-  d3.select(this)
-    .transition()
-    .duration(150)
-    .attr('r', 20) // Return to base radius
-    .attr('stroke-width', 3)
-    .style('stroke', '#fff'); // Return to base stroke
-
-  // 2. Hide the tooltip
+// This function just hides the tooltip
+function hideTooltip() {
   document.getElementById('nodeTooltip').classList.remove('active');
 }
-// --- END OF TOOLTIP/HOVER FIX ---
+// --- END OF TOOLTIP/HOVER REFACTOR ---
 
 
 function getFormatIcon(artifact) {
