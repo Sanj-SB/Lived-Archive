@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lived Archive - Submit Artifact</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="submit-styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo"></div>
+    <div class="header-center">
+      <button class="btn" onclick="window.location.href='index.html'">Home</button>
+      <input type="text" class="search-bar" placeholder="🔍 Search">
+    </div>
+    <button class="btn" onclick="window.location.href='admin.html'">Login</button>
+  </div>
+
+  <!-- Submit Page -->
+  <div id="submitPage" class="page active">
+    <div class="submit-header">
+      <div class="date-text">October 10, 2025</div>
+      <h1>Be a part of the Lived Archive</h1>
+      <p>An Archive of lived realities; for the people, by the people, and of the people.</p>
+    </div>
+
+    <div class="upload-section">
+      <div class="upload-grid">
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+          <h3>Upload image or PDF</h3>
+          <p>Click to select an image or PDF file</p>
+          <input type="file" id="fileInput" accept="image/*,application/pdf">
+        </div>
+        <div class="upload-box" onclick="document.getElementById('audioInput').click()">
+          <h3>Upload Audio</h3>
+          <p>Click to select an audio file</p>
+          <input type="file" id="audioInput" accept="audio/*">
+        </div>
+      </div>
+
+      <div class="upload-box full-width">
+        <h3>Upload Text</h3>
+        <textarea id="textInput" class="text-upload" placeholder="Paste text for your artifact or text that accompanies the image/pdf/audio file you input"></textarea>
+      </div>
+
+      <div id="filePreview" class="file-preview"></div>
+
+      <div class="generate-section">
+        <button class="btn" id="generateBtn" onclick="generateTags()">Start Tagging</button>
+        <div id="loadingMsg">Creating tags...</div>
+        <div id="errorMsg"></div>
+      </div>
+    </div>
+
+    <!-- Results Section (Tags) -->
+    <div id="resultsSection" class="results-section">
+      <div class="tag-category">
+        <h3>What type of content is it?</h3>
+        <div id="contentTags" class="tags-container"></div>
+        <div class="custom-tag-input">
+          <input type="text" id="customcontentTag" placeholder="Add custom tag">
+          <button onclick="addCustomTag('content')">Add</button>
+        </div>
+      </div>
+
+      <div class="tag-category">
+        <h3>What is the form of the artifact?</h3>
+        <div id="formTags" class="tags-container"></div>
+        <div class="custom-tag-input">
+          <input type="text" id="customformTag" placeholder="Add custom tag">
+          <button onclick="addCustomTag('form')">Add</button>
+        </div>
+      </div>
+
+      <div class="tag-category">
+        <h3>What is this artifact's purpose?</h3>
+        <div id="useTags" class="tags-container"></div>
+        <div class="custom-tag-input">
+          <input type="text" id="customuseTag" placeholder="Add custom tag">
+          <button onclick="addCustomTag('use')">Add</button>
+        </div>
+      </div>
+
+      <div class="tag-category">
+        <h3>What context was this created in?</h3>
+        <div id="contextTags" class="tags-container"></div>
+        <div class="custom-tag-input">
+          <input type="text" id="customcontextTag" placeholder="Add custom tag">
+          <button onclick="addCustomTag('context')">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Summary -->
+    <div id="selectedSummary" class="selected-summary">
+      <h3>Selected Tags: <span id="selectedCount">0</span></h3>
+    </div>
+
+    <!-- Description Section -->
+    <div id="descriptionSection" class="description-section">
+      <h3>Artifact Details</h3>
+      <div style="display: grid; gap: 20px;">
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Title *</label>
+          <input type="text" id="artifactTitle" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Date the Artifact was created *</label>
+          <input type="date" id="artifactDate" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Created By *</label>
+          <input type="text" id="artifactCreator" placeholder="Who created this? If it was someone other than you, please credit them here!" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Why It Was Created *</label>
+          <textarea id="artifactPurpose" placeholder="What makes this an important piece? Why did you make it?" style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">General Description *</label>
+          <textarea id="artifactDescription" placeholder="Tell us where this came from, was it passed down? How did you make it? Any other things that tell the story of your artifact!" style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">URL (Optional)</label>
+          <input type="url" id="artifactURL" placeholder="https://example.com" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Section -->
+    <div id="submitSection" class="submit-section">
+      <button class="btn" onclick="submitArtifact()">Submit Artifact</button>
+    </div>
+  </div>
+
+  <!-- User Info Modal -->
+  <div id="userInfoModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>Your Information</h2>
+        <button class="close-modal" onclick="closeUserInfoModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; gap: 20px;">
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name *</label>
+            <input type="text" id="submitterName" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Email ID *</label>
+            <input type="email" id="submitterEmail" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Designation/Relation to collectives/organisation (Optional)</label>
+            <input type="text" id="submitterDesignation" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+          </div>
+          <div id="userInfoError" style="display: none; color: #c62828; text-align: center;"></div>
+          <button class="btn" onclick="submitUserInfo()" style="width: 100%;">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="submit.js"></script>
+</body>
+</html>

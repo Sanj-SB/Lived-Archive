@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lived Archive - Admin</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo"></div>
+    <div class="header-center">
+      <button class="btn" onclick="window.location.href='index.html'">Home</button>
+      <input type="text" class="search-bar" placeholder="🔍 Search">
+    </div>
+    <button class="btn" id="logoutBtn" onclick="handleLogout()" style="display: none;">Logout</button>
+  </div>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="page active">
+    <div class="login-container">
+      <div class="login-box">
+        <h1>Admin Login</h1>
+        <p>Please enter your credentials to access the review queue</p>
+        <div class="login-form">
+          <div>
+            <label>Username</label>
+            <input type="text" id="loginUsername" placeholder="Enter username">
+          </div>
+          <div>
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password">
+          </div>
+          <div id="loginError" class="error-message"></div>
+          <button class="btn" onclick="submitLogin()">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Queue Page -->
+  <div id="reviewPage" class="page">
+    <div class="review-header">
+      <h1>Review Queue</h1>
+      <p id="queueCount">0 artifacts pending review</p>
+    </div>
+    <div class="review-content" id="reviewContent">
+      <!-- Review content will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Modal for Artifact Details -->
+  <div id="artifactModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Artifact Details</h2>
+        <button class="close-modal" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
