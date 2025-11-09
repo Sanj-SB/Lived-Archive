@@ -144,21 +144,31 @@ document.addEventListener('DOMContentLoaded', () => {
       if (accErr) console.error('Error fetching accepted_artifacts:', accErr);
       else if (acceptedRows) {
         // Map Supabase rows, convert file_url to public URL if present
-        const supabaseArtifacts = acceptedRows.map((r) => ({
-          id: r.id,
-          title: r.title,
-          tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
-          timestamp: r.timestamp,
-          format: r.format,
-          textContent: r.text_content || null,
-          description: r.description || '',
-          file_url: r.file_url ? (window.getPublicUrl ? window.getPublicUrl('artifacts', r.file_url) : r.file_url) : null,
-          submitter: {
-            name: r.submitter_name || '',
-            email: r.submitter_email || '',
-            designation: r.submitter_designation || ''
+        const supabaseArtifacts = acceptedRows.map((r) => {
+          let publicFileUrl = r.file_url;
+          console.log('[Artifact Mapping] file_url:', r.file_url, 'window.getPublicUrl:', window.getPublicUrl);
+          if (r.file_url && window.getPublicUrl && !r.file_url.startsWith('http')) {
+            publicFileUrl = window.getPublicUrl('artifacts', r.file_url);
+            console.log('[Artifact Mapping] publicFileUrl:', publicFileUrl);
           }
-        }));
+          return {
+            id: r.id,
+            title: r.title,
+            tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
+            timestamp: r.timestamp,
+            format: r.format,
+            textContent: r.text_content || null,
+            description: r.description || '',
+            file_url: publicFileUrl || null,
+            visual_url: publicFileUrl || '',
+            audio_url: '',
+            submitter: {
+              name: r.submitter_name || '',
+              email: r.submitter_email || '',
+              designation: r.submitter_designation || ''
+            }
+          };
+        });
         // Merge pre-loaded sample artifacts with Supabase artifacts
         acceptedArtifacts = [...supabaseArtifacts, ...acceptedArtifacts];
       }
@@ -167,22 +177,31 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pendErr) console.error('Error fetching pending_artifacts:', pendErr);
       else if (pendingRows) {
         console.log('Supabase pendingRows:', pendingRows);
-        pendingArtifacts = pendingRows.map((r) => ({
-          id: r.id,
-          created_at: r.created_at,
-          title: r.title,
-          tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
-          description: r.description || '',
-          format: r.format || '',
-          textContent: r.text_content || '',
-          visual_url: r.file_url || '',
-          audio_url: '',
-          submitter: {
-            name: r.submitter_name || '',
-            email: r.submitter_email || '',
-            designation: r.submitter_designation || ''
+        pendingArtifacts = pendingRows.map((r) => {
+          let publicFileUrl = r.file_url;
+          console.log('[Pending Mapping] file_url:', r.file_url, 'window.getPublicUrl:', window.getPublicUrl);
+          if (r.file_url && window.getPublicUrl) {
+            publicFileUrl = window.getPublicUrl('artifacts', r.file_url);
+            console.log('[Pending Mapping] publicFileUrl:', publicFileUrl);
           }
-        }));
+          return {
+            id: r.id,
+            created_at: r.created_at,
+            title: r.title,
+            tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
+            description: r.description || '',
+            format: r.format || '',
+            textContent: r.text_content || '',
+            visual_url: publicFileUrl || '',
+            file_url: publicFileUrl || '',
+            audio_url: '',
+            submitter: {
+              name: r.submitter_name || '',
+              email: r.submitter_email || '',
+              designation: r.submitter_designation || ''
+            }
+          };
+        });
       }
 
       // After fetching, load the graph and update review queue

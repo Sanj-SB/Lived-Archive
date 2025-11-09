@@ -212,9 +212,8 @@ export function viewArtifactDetails(index, isPending, pendingArtifacts, accepted
           submitter_designation: artifact.submitter?.designation || '',
           timestamp: artifact.created_at,
           format: artifact.format,
+          file_url: artifact.file_url || artifact.visual_url || null,
         };
-        // Only add file_url for image/pdf/audio
-        if (artifact.file_url) row.file_url = artifact.file_url;
         // Only add text_content for text
         if (artifact.textContent && artifact.format === 'text') row.text_content = artifact.textContent;
         // Insert into accepted_artifacts
@@ -337,6 +336,10 @@ export function viewArtifactDetails(index, isPending, pendingArtifacts, accepted
 export function acceptArtifact(index, pendingArtifacts, acceptedArtifacts, loadArchiveCallback) {
   // Move the artifact from pending array to accepted array and sync with database
   const artifact = pendingArtifacts.splice(index, 1)[0];
+  // Ensure file_url is copied to accepted artifact
+  if (!artifact.file_url && artifact.visual_url) {
+    artifact.file_url = artifact.visual_url;
+  }
   acceptedArtifacts.push(artifact);
 
   // Try to update Supabase: remove from pending_artifacts and insert into accepted_artifacts
@@ -361,6 +364,7 @@ export function acceptArtifact(index, pendingArtifacts, acceptedArtifacts, loadA
           timestamp: artifact.timestamp,
           format: artifact.format,
           text_content: artifact.textContent || null,
+          file_url: artifact.file_url || artifact.visual_url || artifact.visualDataURL || null,
           visual_url: artifact.visual_url || artifact.visualDataURL || null,
           audio_url: artifact.audio_url || artifact.audioDataURL || null,
           status: 'accepted'
