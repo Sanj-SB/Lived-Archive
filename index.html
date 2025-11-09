@@ -9,14 +9,20 @@
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
-  <!-- Header -->
+  <!-- Header / Navbar -->
   <div class="header">
-    <div class="logo"></div>
-    <div class="header-center">
-      <button class="btn" id="submitArtifactBtn">Submit Artifact</button>
-  <input type="text" class="search-bar" placeholder="🔍 Search" id="mainSearch" autocomplete="off">
+    <nav class="nav-left">
+      <a class="btn link-home" href="index.html">Home</a>
+      <button class="btn btn-submit" id="submitArtifactBtn" type="button">Submit Artifact</button>
+    </nav>
+    <nav class="nav-right">
+      <a class="btn link-login" href="admin.html">Login</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    <div class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
+      <a href="index.html" role="menuitem">Home</a>
+      <a href="admin.html" role="menuitem">Login</a>
     </div>
-    <button class="btn" id="loginBtn">Login</button>
   </div>
 
   <!-- Home Page (Archive) -->
@@ -62,7 +68,7 @@
     </div>
   </div>
 
-  <!-- User Info Modal -->
+  <!-- User Info Modal (kept for legacy submit flow on Home, but navbar now links directly to submit.html) -->
   <div id="userInfoModal" class="modal">
     <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
@@ -170,10 +176,21 @@ document.addEventListener('DOMContentLoaded', function() {
           errorDiv.style.display = 'block';
           return;
         }
+        // Persist info across redirect so submit.html can pick it up
+        try { sessionStorage.setItem('submitterInfo', JSON.stringify({ name: name, email: email, designation: designation })); } catch (e) {}
         userInfoModal.classList.remove('active');
         window.location.href = 'submit.html';
       };
     }
+  }
+  // Mobile nav toggle logic
+  var navToggle = document.getElementById('navToggle');
+  var navMenu = document.getElementById('navMenu');
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', function() {
+      var isActive = navMenu.classList.toggle('active');
+      navMenu.setAttribute('aria-hidden', String(!isActive));
+    });
   }
 });
 </script>

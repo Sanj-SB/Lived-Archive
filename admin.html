@@ -8,20 +8,48 @@
   <link rel="stylesheet" href="css/admin-styles.css">
 </head>
 <body>
-  <!-- Header -->
+  <!-- Header / Navbar -->
   <div class="header">
-    <div class="logo"></div>
-    <div class="header-center">
-      <button class="btn" onclick="window.location.href='index.html'">Home</button>
-      <button class="btn" onclick="window.location.href='submit.html'">Submit Artifact</button>
+    <nav class="nav-left">
+      <a class="btn link-home" href="index.html">Home</a>
+      <button class="btn btn-submit" id="openUserInfoBtn" type="button">Submit Artifact</button>
+    </nav>
+    <nav class="nav-right">
+      <button class="btn link-login" id="logoutBtn" style="display: none;" onclick="handleLogout()">Logout</button>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    <div class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
+      <a href="index.html" role="menuitem">Home</a>
+      <button role="menuitem" class="menu-logout" onclick="handleLogout()">Logout</button>
     </div>
-    <button class="btn" id="logoutBtn" style="display: none;" onclick="handleLogout()">Logout</button>
   </div>
 
   <!-- Login Page removed. Review queue shown by default. -->
 
   <!-- Review Page -->
   <div id="reviewPage" class="page">
+    <!-- Admin Summary Section -->
+    <section class="admin-summary" aria-labelledby="adminSummaryHeading">
+      <h2 id="adminSummaryHeading">Dashboard Overview</h2>
+      <p class="admin-summary-intro">The Lived Archive is a community effort, community lead, and you make the decisions collectively here. By being a part of the admin, you review artifacts, and help ensure the archive meets it’s full potential. Thank you!</p>
+      <div class="summary-grid">
+        <div class="summary-card" id="pendingCard">
+          <h3>Pending</h3>
+          <p class="summary-number" id="summaryPending">0</p>
+          <p class="summary-sub">Artifacts awaiting review</p>
+        </div>
+        <div class="summary-card" id="acceptedCard">
+          <h3>Accepted</h3>
+          <p class="summary-number" id="summaryAccepted">0</p>
+          <p class="summary-sub">Artifacts published</p>
+        </div>
+        <div class="summary-card" id="latestCard">
+          <h3>Latest Submission</h3>
+          <p class="summary-number" id="summaryLatest">—</p>
+          <p class="summary-sub" id="summaryLatestTitle">No submissions yet</p>
+        </div>
+      </div>
+    </section>
     <div class="review-header">
       <h1>Review Queue</h1>
       <p id="pendingCount">0 artifacts pending review</p>
@@ -42,6 +70,34 @@
     </div>
   </div>
 
+  <!-- User Info Modal (for starting submit flow from Admin) -->
+  <div id="userInfoModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>Your Information</h2>
+        <button class="close-modal" id="closeUserInfoModalBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; gap: 20px;">
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name *</label>
+            <input type="text" id="submitterName" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Email ID *</label>
+            <input type="email" id="submitterEmail" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Designation/Relation to collectives/organisation (Optional)</label>
+            <input type="text" id="submitterDesignation" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+          </div>
+          <div id="userInfoError" style="display: none; color: #c62828; text-align: center;"></div>
+          <button class="btn" id="continueUserInfoBtn" style="width: 100%;">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/script.js"></script>
   <script type="module">
     import { supabase } from './js/supabaseClient.js';
@@ -49,6 +105,7 @@
     window.addEventListener('DOMContentLoaded', async () => {
       // Fetch pending artifacts from Supabase
       let pendingArtifacts = [];
+      let acceptedCount = 0;
       try {
         const { data: pendingRows, error: pendErr } = await supabase.from('pending_artifacts').select('*').order('timestamp', { ascending: false });
         if (pendErr) console.error('Error fetching pending_artifacts:', pendErr);
@@ -70,12 +127,88 @@
             }
           }));
         }
+        // Fetch accepted artifacts count only (lightweight)
+        const { count: accCount, error: accErr } = await supabase
+          .from('accepted_artifacts')
+          .select('*', { count: 'exact', head: true });
+        if (accErr) console.error('Error counting accepted_artifacts:', accErr);
+        else if (typeof accCount === 'number') acceptedCount = accCount;
       } catch (err) {
         console.error('Error initializing data from Supabase:', err);
       }
       // Render review queue
       initializeAdmin();
       loadReviewQueue(pendingArtifacts);
+
+      // Populate summary section
+      try {
+        const pendingEl = document.getElementById('summaryPending');
+        const acceptedEl = document.getElementById('summaryAccepted');
+        const latestEl = document.getElementById('summaryLatest');
+        const latestTitleEl = document.getElementById('summaryLatestTitle');
+        if (pendingEl) pendingEl.textContent = pendingArtifacts.length;
+        if (acceptedEl) acceptedEl.textContent = acceptedCount;
+        if (latestEl && latestTitleEl) {
+          if (pendingArtifacts.length > 0) {
+            const latest = pendingArtifacts[0]; // ordered desc by timestamp
+            // date formatting
+            let dateStr = '—';
+            if (latest.timestamp || latest.created_at) {
+              const raw = latest.timestamp || latest.created_at;
+              const d = new Date(raw);
+              if (!isNaN(d.getTime())) {
+                dateStr = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+              }
+            }
+            latestEl.textContent = dateStr;
+            latestTitleEl.textContent = latest.title || 'Untitled';
+          } else {
+            latestEl.textContent = '—';
+            latestTitleEl.textContent = 'No submissions yet';
+          }
+        }
+      } catch(e) { console.warn('Summary population error:', e); }
+    });
+  </script>
+  <script>
+    // Admin page: open user info modal and redirect to submit.html after collecting info
+    document.addEventListener('DOMContentLoaded', function() {
+      var openBtn = document.getElementById('openUserInfoBtn');
+      var modal = document.getElementById('userInfoModal');
+      var closeBtn = document.getElementById('closeUserInfoModalBtn');
+      var continueBtn = document.getElementById('continueUserInfoBtn');
+      if (openBtn && modal) {
+        openBtn.onclick = function() {
+          modal.classList.add('active');
+          ['submitterName','submitterEmail','submitterDesignation'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+          var err=document.getElementById('userInfoError'); if(err) err.style.display='none';
+        };
+      }
+      if (closeBtn) closeBtn.onclick = function(){ modal.classList.remove('active'); };
+      if (continueBtn) continueBtn.onclick = function(){
+        var name = document.getElementById('submitterName').value.trim();
+        var email = document.getElementById('submitterEmail').value.trim();
+        var designation = document.getElementById('submitterDesignation').value.trim();
+        var errorDiv = document.getElementById('userInfoError');
+        if (!name || !email) { errorDiv.textContent='Please fill in all required fields'; errorDiv.style.display='block'; return; }
+        var emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(!emailRegex.test(email)){ errorDiv.textContent='Please enter a valid email address'; errorDiv.style.display='block'; return; }
+        try { sessionStorage.setItem('submitterInfo', JSON.stringify({ name:name, email:email, designation:designation })); } catch(e){}
+        modal.classList.remove('active');
+        window.location.href = 'submit.html';
+      };
+    });
+  </script>
+  <script>
+    // Mobile nav toggle (Admin page)
+    document.addEventListener('DOMContentLoaded', function(){
+      var navToggle = document.getElementById('navToggle');
+      var navMenu = document.getElementById('navMenu');
+      if (navToggle && navMenu) {
+        navToggle.addEventListener('click', function() {
+          var isActive = navMenu.classList.toggle('active');
+          navMenu.setAttribute('aria-hidden', String(!isActive));
+        });
+      }
     });
   </script>
 </body>

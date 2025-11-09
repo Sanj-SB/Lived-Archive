@@ -9,14 +9,20 @@
   <link rel="icon" href="data:,">
 </head>
 <body>
-  <!-- Header -->
+  <!-- Header / Navbar -->
   <div class="header">
-    <div class="logo"></div>
-    <div class="header-center">
-      <button class="btn" onclick="window.location.href='index.html'">Home</button>
-      <input type="text" class="search-bar" placeholder="🔍 Search">
+    <nav class="nav-left">
+      <a class="btn link-home" href="index.html">Home</a>
+      <a class="btn btn-submit" href="submit.html" aria-current="page">Submit Artifact</a>
+    </nav>
+    <nav class="nav-right">
+      <a class="btn link-login" href="admin.html">Login</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    <div class="nav-menu" id="navMenu" role="menu" aria-hidden="true">
+      <a href="index.html" role="menuitem">Home</a>
+      <a href="admin.html" role="menuitem">Login</a>
     </div>
-  <button class="btn" id="globalLoginBtn" onclick="handleLoginClick()">Login</button>
   </div>
   <!-- Global Login Modal -->
   <div id="loginModal" class="modal">
@@ -188,6 +194,48 @@
   </div>
 
   <script type="module" src="js/submit.js"></script>
+  <script>
+    // Auto-open user info modal if arriving with ?start=1
+    document.addEventListener('DOMContentLoaded', () => {
+      // Prefill from sessionStorage if coming from Home/Admin
+      try {
+        const stored = sessionStorage.getItem('submitterInfo');
+        if (stored) {
+          const info = JSON.parse(stored);
+          if (info && info.name) {
+            window.currentSubmitterInfo = info; // keep for submit.js usage
+            const modal = document.getElementById('userInfoModal');
+            if (modal) modal.parentNode.removeChild(modal); // remove modal when info already provided
+          }
+        }
+      } catch(e) {}
+      // Mobile nav toggle
+      var navToggle = document.getElementById('navToggle');
+      var navMenu = document.getElementById('navMenu');
+      if (navToggle && navMenu) {
+        navToggle.addEventListener('click', function() {
+          var isActive = navMenu.classList.toggle('active');
+          navMenu.setAttribute('aria-hidden', String(!isActive));
+        });
+      }
+    });
+    // Basic handlers for user info modal on submit page
+    function closeUserInfoModal(){ const m=document.getElementById('userInfoModal'); if(m) m.classList.remove('active'); }
+    window.closeUserInfoModal = closeUserInfoModal;
+    function submitUserInfo(){
+      const name = document.getElementById('submitterName').value.trim();
+      const email = document.getElementById('submitterEmail').value.trim();
+      const designation = document.getElementById('submitterDesignation').value.trim();
+      const errorDiv = document.getElementById('userInfoError');
+      errorDiv.style.display='none';
+      if(!name || !email){ errorDiv.textContent='Please fill in all required fields'; errorDiv.style.display='block'; return; }
+      const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(!emailRegex.test(email)){ errorDiv.textContent='Please enter a valid email address'; errorDiv.style.display='block'; return; }
+  window.currentSubmitterInfo = { name, email, designation };
+  try { sessionStorage.setItem('submitterInfo', JSON.stringify(window.currentSubmitterInfo)); } catch(e){}
+      closeUserInfoModal();
+    }
+    window.submitUserInfo = submitUserInfo;
+  </script>
   <script type="module">
     import { handleLoginClick, submitLogin, closeLoginModal, initializeAdmin } from './js/admin.js';
     document.getElementById('globalLoginBtn').addEventListener('click', handleLoginClick);
