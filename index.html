@@ -28,7 +28,7 @@
   <!-- Home Page (Archive) -->
   <div id="homePage" class="page active">
     <div class="home-header">
-      <div class="date-text">October 10, 2025</div>
+  <div class="date-text" id="homeDate"></div>
       <h1>Lived Archive</h1>
       <p>An Archive of lived realities; of the people, for the people, by the people.</p>
     </div>
@@ -129,6 +129,13 @@
 <!-- Fallback: ensure submit modal closes and graph loads -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Auto-update home page date
+  var dateEl = document.getElementById('homeDate');
+  if (dateEl) {
+    var today = new Date();
+    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+    dateEl.textContent = today.toLocaleDateString(undefined, options);
+  }
   // Close user info modal on X button
   var closeBtn = document.getElementById('closeUserInfoModalBtn');
   var userInfoModal = document.getElementById('userInfoModal');
