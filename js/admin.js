@@ -246,14 +246,31 @@ export function viewArtifactDetails(index, isPending, pendingArtifacts, accepted
   const modal = document.getElementById('artifactModal');
   const modalBody = document.getElementById('modalBody');
   // Prefer visual_url (from Supabase), fallback to file_url, then nothing
+  let fileSection = '';
   const imageUrl = artifact.visual_url || artifact.file_url || null;
   if (imageUrl) {
-    contentHTML += `
+    fileSection += `
       <div class="artifact-section">
         <img src="${imageUrl}" class="artifact-image" alt="Artifact image">
       </div>
     `;
   }
+  // PDF or other file types
+  if (artifact.format === 'pdf' && artifact.file_url) {
+    fileSection += `
+      <div class="artifact-section">
+        <a href="${artifact.file_url}" target="_blank" class="artifact-file-link">View PDF</a>
+      </div>
+    `;
+  } else if (artifact.file_url && !imageUrl) {
+    // Fallback for other file types
+    fileSection += `
+      <div class="artifact-section">
+        <a href="${artifact.file_url}" target="_blank" class="artifact-file-link">Download File</a>
+      </div>
+    `;
+  }
+  contentHTML += fileSection;
   // Title
   contentHTML += `
     <div class="artifact-section">
@@ -292,14 +309,14 @@ export function viewArtifactDetails(index, isPending, pendingArtifacts, accepted
     `;
   }
   // Submitter information
-  if (artifact.submitter) {
+  if (artifact.submitter && (artifact.submitter.name || artifact.submitter.email || artifact.submitter.designation)) {
     contentHTML += `
       <div class="artifact-section">
         <h3>Submitted By</h3>
         <div class="artifact-text">
-          <strong>Name:</strong> ${artifact.submitter.name}<br>
-          <strong>Email:</strong> ${artifact.submitter.email}<br>
-          <strong>Designation:</strong> ${artifact.submitter.designation}
+          ${artifact.submitter.name ? `<strong>Name:</strong> ${artifact.submitter.name}<br>` : ''}
+          ${artifact.submitter.email ? `<strong>Email:</strong> ${artifact.submitter.email}<br>` : ''}
+          ${artifact.submitter.designation ? `<strong>Designation:</strong> ${artifact.submitter.designation}` : ''}
         </div>
       </div>
     `;

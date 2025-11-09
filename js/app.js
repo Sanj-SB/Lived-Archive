@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const { data: acceptedRows, error: accErr } = await supabase.from('accepted_artifacts').select('*').order('timestamp', { ascending: false });
       if (accErr) console.error('Error fetching accepted_artifacts:', accErr);
       else if (acceptedRows) {
-        // Map Supabase rows
+        // Map Supabase rows, convert file_url to public URL if present
         const supabaseArtifacts = acceptedRows.map((r) => ({
           id: r.id,
           title: r.title,
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
           format: r.format,
           textContent: r.text_content || null,
           description: r.description || '',
-          file_url: r.file_url || null,
+          file_url: r.file_url ? (window.getPublicUrl ? window.getPublicUrl('artifacts', r.file_url) : r.file_url) : null,
           submitter: {
             name: r.submitter_name || '',
             email: r.submitter_email || '',
