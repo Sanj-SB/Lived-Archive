@@ -1,0 +1,157 @@
+/* Network Graph Styles */
+.graph-container {
+  width: 100%;
+  height: calc(100vh - 200px);
+  background: white;
+  border-radius: 20px;
+  margin: 0 auto;
+  max-width: 1400px;
+  position: relative;
+  overflow: hidden;
+}
+
+.graph-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  max-width: 300px;
+}
+
+.graph-controls h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: normal;
+}
+
+.category-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-filter label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.category-filter input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.tag-filter-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.graph-search {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+/* --- NODE STYLE FIX --- */
+.node {
+  cursor: pointer;
+  stroke: #fff;
+  stroke-width: 3px; 
+  transition: all 0.2s ease-in-out; /* Keep the smooth transition */
+}
+
+/* REMOVED the .node:hover rule that caused flickering */
+
+.link {
+  stroke: #999;
+  stroke-opacity: 0.3;
+  stroke-width: 1px;
+}
+
+.node-tooltip {
+  position: absolute;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  pointer-events: none; /* This is crucial! */
+  z-index: 1000;
+  max-width: 300px;
+  display: none;
+}
+
+.node-tooltip.active {
+  display: block;
+}
+
+.node-tooltip h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.node-tooltip .tooltip-date {
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.node-tooltip .tooltip-format {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.node-tooltip .tooltip-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.node-tooltip .tag {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.zoom-btn:hover {
+  background: #f5f5f5;
+}

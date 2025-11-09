@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Lived Archive</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="admin-styles.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin-styles.css">
 </head>
 <body>
   <!-- Header -->
@@ -18,27 +18,7 @@
     <button class="btn" id="logoutBtn" style="display: none;" onclick="handleLogout()">Logout</button>
   </div>
 
-  <!-- Login Page -->
-  <div id="loginPage" class="page active">
-    <div class="login-container">
-      <div class="login-box">
-        <h1>Admin Login</h1>
-        <p>Please login to access the review queue</p>
-        <div class="login-form">
-          <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="loginUsername" placeholder="Enter username">
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="Enter password">
-          </div>
-          <div id="loginError" class="error-message"></div>
-          <button class="btn" onclick="handleLogin()" style="width: 100%;">Login</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Login Page removed. Review queue shown by default. -->
 
   <!-- Review Page -->
   <div id="reviewPage" class="page">
@@ -62,7 +42,41 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
-  <script src="admin.js"></script>
+  <script src="js/script.js"></script>
+  <script type="module">
+    import { supabase } from './js/supabaseClient.js';
+    import { loadReviewQueue, initializeAdmin } from './js/admin.js';
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Fetch pending artifacts from Supabase
+      let pendingArtifacts = [];
+      try {
+        const { data: pendingRows, error: pendErr } = await supabase.from('pending_artifacts').select('*').order('timestamp', { ascending: false });
+        if (pendErr) console.error('Error fetching pending_artifacts:', pendErr);
+        else if (pendingRows) {
+          pendingArtifacts = pendingRows.map((r) => ({
+            id: r.id,
+            created_at: r.created_at,
+            title: r.title,
+            tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
+            description: r.description || '',
+            format: r.format || '',
+            textContent: r.text_content || '',
+            visual_url: r.file_url || '',
+            audio_url: '',
+            submitter: {
+              name: r.submitter_name || '',
+              email: r.submitter_email || '',
+              designation: r.submitter_designation || ''
+            }
+          }));
+        }
+      } catch (err) {
+        console.error('Error initializing data from Supabase:', err);
+      }
+      // Render review queue
+      initializeAdmin();
+      loadReviewQueue(pendingArtifacts);
+    });
+  </script>
 </body>
 </html>

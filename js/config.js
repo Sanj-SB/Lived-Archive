@@ -1,0 +1,71 @@
+// config.js - Tag/category configuration for the submission UI
+
+export const tagCategories = {
+  'Theme': [
+    'Social Justice',
+    'Caste & Marginalization',
+    "Labor & Workers' Rights",
+    'Gender & Sexuality',
+    'Education & Literacy',
+    'Health & Wellbeing',
+    'Community Organizing',
+    'Resistance & Protest',
+    'Culture & Heritage',
+    'Urban Life & Infrastructure',
+    'Migration & Displacement',
+    'Everyday Life & Small Joys',
+    'Food & Shared Spaces',
+    'Music & Folk Traditions',
+    'Humor & Satire'
+  ],
+  'Format': [
+    'Text (Article, Essay, Letter)',
+    'Print Publication (Magazine, Zine)',
+    'Social Media Post',
+    'Photograph / Still Image',
+    'Audio Recording (Oral History, Podcast, Song)',
+    'Video (Interview, Performance, Documentary)',
+    'Artwork / Illustration',
+    'Theatre Script / Performance',
+    'Physical Artifact (Poster, Object, Clothing)',
+    'Mixed Media / Collage',
+    'Doodle / Sketchbook Page',
+    'Personal Note / Journal Entry',
+    'Event Poster / Flyer',
+    'Conversation Snippet'
+  ],
+  'Intended Use': [
+    'Awareness / Advocacy',
+    'Educational Resource',
+    'Community Mobilization',
+    'Memory & Commemoration',
+    'Cultural Expression',
+    'Protest Documentation',
+    'Alternative News / Reporting',
+    'Knowledge Sharing',
+    'Storytelling / Oral Tradition',
+    'Artistic Practice',
+    'Celebration or Festival Record',
+    'Personal Reflection',
+    'Social Bonding Activity',
+    'Local Talent Showcase',
+    'Everyday Learning'
+  ],
+  'Context': [
+    'Local Community Distribution',
+    'Grassroots Collective',
+    'Activist Circles',
+    'Student Circles',
+    'Digital Communities',
+    'Diaspora Networks',
+    'Informal Circulation',
+    'Independent Publication',
+    'Institutional Archive',
+    'Online Repository',
+    'Neighborhood Gathering',
+    'Festival or Public Event',
+    'Friends & Family Networks',
+    'Pop-Up or Temporary Space',
+    'Club or Hobby Group'
+  ]
+};
