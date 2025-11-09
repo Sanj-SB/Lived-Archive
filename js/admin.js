@@ -175,90 +175,39 @@ function createReviewCard(artifact, index, artifactsArr) {
       </div>
     </div>
   `;
-  // Expose viewArtifactDetails globally for card click
+  // Expose viewArtifactDetails globally for card click (working site logic)
   if (typeof window !== 'undefined') {
     window.viewArtifactDetailsHandler = (idx, isPending, artifactsArr) => {
       viewArtifactDetails(idx, isPending, artifactsArr, []);
     };
   }
-  card.onclick = () => window.viewArtifactDetailsHandler(index, true, artifactsArr);
+  card.onclick = () => {
+    console.log('Artifact card clicked:', index, artifact.title);
+    window.viewArtifactDetailsHandler(index, true, artifactsArr);
+  };
   return card;
 }
 
 // View artifact details in modal
 export function viewArtifactDetails(index, isPending, pendingArtifacts, acceptedArtifacts) {
-  const artifact = isPending ? pendingArtifacts[index] : acceptedArtifacts[index];
-  let contentHTML = '';
-  // Accept button for pending artifacts
-  if (isPending) {
-    contentHTML += `
-      <div class="review-actions">
-        <button class="accept-btn" onclick="window.acceptArtifactHandler(${index})">Accept</button>
-      </div>
-    `;
-    window.acceptArtifactHandler = async function(idx) {
-  const artifact = pendingArtifacts[idx];
-  console.log('Attempting to delete artifact:', artifact);
-  console.log('Artifact id used for delete:', artifact.id);
-      // Move artifact from pending to accepted in Supabase
-      try {
-        // Build row for accepted_artifacts based on schema
-        const row = {
-          title: artifact.title,
-          description: artifact.description,
-          tags: artifact.tags,
-          submitter_name: artifact.submitter?.name || '',
-          submitter_email: artifact.submitter?.email || '',
-          submitter_designation: artifact.submitter?.designation || '',
-          timestamp: artifact.created_at,
-          format: artifact.format,
-          file_url: artifact.file_url || artifact.visual_url || null,
-        };
-        // Only add text_content for text
-        if (artifact.textContent && artifact.format === 'text') row.text_content = artifact.textContent;
-        // Insert into accepted_artifacts
-        const { data: insertData, error: insertErr } = await window.supabase.from('accepted_artifacts').insert([row]);
-        if (insertErr) {
-          alert('Error inserting into accepted_artifacts: ' + insertErr.message);
-          return;
-        }
-        // Delete from pending_artifacts
-        const { data: deleteData, error: deleteErr } = await window.supabase.from('pending_artifacts').delete().eq('id', artifact.id);
-        if (deleteErr) {
-          alert('Error deleting from pending_artifacts: ' + deleteErr.message);
-          console.error('Delete error details:', deleteErr);
-          return;
-        }
-        if (!deleteData || (Array.isArray(deleteData) && deleteData.length === 0)) {
-          alert('Delete operation did not remove any rows. Check if the artifact id matches the table.');
-          console.warn('Delete operation returned:', deleteData);
-        }
-        alert('Artifact accepted and moved to archive!');
-        document.getElementById('artifactModal').classList.remove('active');
-        // Refresh page to update queue and graph
-        window.location.reload();
-      } catch (err) {
-        alert('Error accepting artifact: ' + err.message);
-      }
-    };
-  }
   const modal = document.getElementById('artifactModal');
   const modalBody = document.getElementById('modalBody');
-  // Prefer visual_url (from Supabase), fallback to file_url, then nothing
+  const artifact = isPending ? pendingArtifacts[index] : acceptedArtifacts[index];
+  console.log('Artifact details:', { format: artifact.format, file_url: artifact.file_url, artifact });
   let fileSection = '';
   const imageUrl = artifact.visual_url || artifact.file_url || null;
-  if (imageUrl) {
+  if (imageUrl && artifact.format !== 'pdf') {
     fileSection += `
       <div class="artifact-section">
         <img src="${imageUrl}" class="artifact-image" alt="Artifact image">
       </div>
     `;
   }
-  // PDF or other file types
+  // If PDF, show a single clickable link to open in new tab
   if (artifact.format === 'pdf' && artifact.file_url) {
     fileSection += `
       <div class="artifact-section">
-        <a href="${artifact.file_url}" target="_blank" class="artifact-file-link">View PDF</a>
+        <a href="${artifact.file_url}" target="_blank" class="artifact-file-link">Open PDF in new tab</a>
       </div>
     `;
   } else if (artifact.file_url && !imageUrl) {
@@ -269,6 +218,7 @@ export function viewArtifactDetails(index, isPending, pendingArtifacts, accepted
       </div>
     `;
   }
+  let contentHTML = '';
   contentHTML += fileSection;
   // Title
   contentHTML += `
