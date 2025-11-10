@@ -31,7 +31,7 @@ export const tagCategories = {
     'Mixed Media / Collage',
     'Doodle / Sketchbook Page',
     'Personal Note / Journal Entry',
-    'Event Poster / Flyer',
+    'Website',
     'Conversation Snippet'
   ],
   'Intended Use': [

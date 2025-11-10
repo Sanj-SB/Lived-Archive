@@ -101,8 +101,8 @@
   <script src="js/script.js"></script>
   <script type="module">
     import { supabase } from './js/supabaseClient.js';
-    import { loadReviewQueue, initializeAdmin } from './js/admin.js';
-    window.addEventListener('DOMContentLoaded', async () => {
+    import { loadReviewQueue, initializeAdmin, acceptArtifact } from './js/admin.js';
+  window.addEventListener('DOMContentLoaded', async () => {
       // Fetch pending artifacts from Supabase
       let pendingArtifacts = [];
       let acceptedCount = 0;
@@ -136,6 +136,19 @@
       } catch (err) {
         console.error('Error initializing data from Supabase:', err);
       }
+      // Expose arrays globally for accept flow
+      window._pendingArtifacts = pendingArtifacts;
+      window._acceptedArtifacts = [];
+      // Define accept handler used by Accept buttons in modal
+      window.acceptArtifactHandler = (index) => {
+        try {
+          // Admin JS handles DB insert, deletion, local arrays, and UI updates safely
+          acceptArtifact(index, window._pendingArtifacts, window._acceptedArtifacts, null);
+        } catch (e) {
+          console.error('Accept handler error:', e);
+          alert('Failed to accept artifact. See console for details.');
+        }
+      };
       // Render review queue
       initializeAdmin();
       loadReviewQueue(pendingArtifacts);

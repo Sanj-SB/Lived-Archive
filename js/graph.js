@@ -1,3 +1,117 @@
+// Persona-to-tags mapping (Content, Form, Use Case, Context)
+window.personaTagsMap = {
+  'Advocate': [
+    // Content
+    'Social Justice', 'Caste & Marginalization', 'Gender & Sexuality', 'Resistance & Protest',
+    // Form
+    'Text', 'Social Media Post', 'Video (Documentary)',
+    // Use Case
+    'Awareness / Advocacy', 'Community Mobilization', 'Protest Documentation',
+    // Context
+    'Activist Circles', 'Grassroots Collective', 'Digital Communities'
+  ],
+  'Artist': [
+    // Content
+    'Culture & Heritage', 'Gender & Sexuality', 'Humor & Satire', 'Everyday Life & Small Joys',
+    // Form
+    'Artwork / Illustration', 'Theatre Script / Performance', 'Mixed Media / Collage',
+    // Use Case
+    'Artistic Practice', 'Cultural Expression', 'Social Bonding Activity',
+    // Context
+    'Pop-Up or Temporary Space', 'Club or Hobby Group', 'Independent Publication'
+  ],
+  'Researcher': [
+    // Content
+    'Social Justice', 'Culture & Heritage', 'Migration & Displacement', "Labor & Workers' Rights",
+    // Form
+    'Text (Essay, Annotation)', 'Photograph', 'Physical Artifact',
+    // Use Case
+    'Knowledge Sharing', 'Memory & Commemoration', 'Educational Resource',
+    // Context
+    'Online Repository', 'Institutional Archive', 'Independent Publication'
+  ],
+  'Educator': [
+    // Content
+    'Education & Literacy', 'Health & Wellbeing', 'Everyday Life & Small Joys',
+    // Form
+    'Text (Essay, Resource)', 'Audio Recording', 'Print Publication',
+    // Use Case
+    'Educational Resource', 'Everyday Learning', 'Knowledge Sharing',
+    // Context
+    'Student Circles', 'Local Community Distribution', 'Institutional Archive'
+  ],
+  'Curious Explorer': [] // No filter
+};
+
+// Lightweight persona selection modal
+function showPersonaModal() {
+  // Prevent duplicate modals
+  if (document.getElementById('personaModalOverlay')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'personaModalOverlay';
+  overlay.style.position = 'fixed';
+  overlay.style.inset = '0';
+  overlay.style.background = 'rgba(0,0,0,0.5)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = '1000';
+
+  const modal = document.createElement('div');
+  modal.style.background = '#fff';
+  modal.style.borderRadius = '10px';
+  modal.style.padding = '20px';
+  modal.style.width = 'min(560px, 92vw)';
+  modal.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+
+  const title = document.createElement('h2');
+  title.textContent = 'Choose a persona';
+  title.style.margin = '0 0 12px 0';
+
+  const subtitle = document.createElement('p');
+  subtitle.textContent = 'This helps tailor the graph to what you care about.';
+  subtitle.style.margin = '0 0 16px 0';
+  subtitle.style.color = '#555';
+
+  const options = ['Advocate', 'Artist', 'Researcher', 'Educator', 'Curious Explorer'];
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(160px, 1fr))';
+  grid.style.gap = '10px';
+
+  options.forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = p;
+    btn.style.padding = '10px 12px';
+    btn.style.borderRadius = '8px';
+    btn.style.border = '1px solid #e2e8f0';
+    btn.style.background = '#f8fafc';
+    btn.style.cursor = 'pointer';
+    btn.onmouseenter = () => btn.style.background = '#eef2f7';
+    btn.onmouseleave = () => btn.style.background = '#f8fafc';
+    btn.onclick = () => {
+      window.selectedPersona = p;
+      localStorage.setItem('selectedPersona', p);
+      window.personaTags = window.personaTagsMap[p] || [];
+      // If radios exist, sync them
+      const radio = document.querySelector(`input[name="personaChoice"][value="${p}"]`);
+      if (radio) radio.checked = true;
+      if (window.updateGraphFilters) window.updateGraphFilters();
+      if (window.updatePersonaBadge) window.updatePersonaBadge();
+      document.body.removeChild(overlay);
+    };
+    grid.appendChild(btn);
+  });
+
+  modal.appendChild(title);
+  modal.appendChild(subtitle);
+  modal.appendChild(grid);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
 // Graph variables
 let simulation = null;
 let svg = null;
@@ -263,6 +377,90 @@ function hideTooltip() {
 
 // Setup filters
 function setupFilters(nodes) {
+  // Persona radios (single-select) styled like category list
+  const personaList = ['Advocate', 'Artist', 'Researcher', 'Educator', 'Curious Explorer'];
+  const personaTagsMap = window.personaTagsMap || {};
+  let personaFilterDiv = document.getElementById('personaFilter');
+  if (!personaFilterDiv) {
+    personaFilterDiv = document.createElement('div');
+    personaFilterDiv.id = 'personaFilter';
+    personaFilterDiv.style.marginBottom = '18px';
+    const sidebar = document.getElementById('sidebar') || document.getElementById('leftSidebar') || document.body;
+    // Try to place above categories if possible; use the category's actual parent to avoid NotFoundError
+    const categoryContainer = document.getElementById('categoryFilter');
+    if (categoryContainer && categoryContainer.parentNode) {
+      categoryContainer.parentNode.insertBefore(personaFilterDiv, categoryContainer);
+    } else if (sidebar) {
+      if (sidebar.firstChild) {
+        sidebar.insertBefore(personaFilterDiv, sidebar.firstChild);
+      } else {
+        sidebar.appendChild(personaFilterDiv);
+      }
+    }
+  }
+  personaFilterDiv.innerHTML = '';
+  // Create a collapsible header for Personas
+  let personaHeader = document.getElementById('personaHeader');
+  if (!personaHeader) {
+    personaHeader = document.createElement('div');
+    personaHeader.id = 'personaHeader';
+    personaHeader.style.display = 'flex';
+    personaHeader.style.alignItems = 'center';
+    personaHeader.style.justifyContent = 'space-between';
+    personaHeader.style.cursor = 'pointer';
+    personaHeader.style.fontWeight = 'bold';
+    personaHeader.style.margin = '8px 0';
+    personaHeader.style.padding = '6px 4px';
+    const label = document.createElement('span');
+    label.textContent = 'Personas';
+    const chevron = document.createElement('span');
+    chevron.id = 'personaChevron';
+    chevron.textContent = '▸';
+    personaHeader.appendChild(label);
+    personaHeader.appendChild(chevron);
+    // Insert header just before persona filter div
+    if (personaFilterDiv.parentNode) {
+      personaFilterDiv.parentNode.insertBefore(personaHeader, personaFilterDiv);
+    }
+  }
+  // Collapsed by default
+  personaFilterDiv.style.display = 'none';
+  personaHeader.onclick = () => {
+    const isHidden = personaFilterDiv.style.display === 'none';
+    personaFilterDiv.style.display = isHidden ? 'block' : 'none';
+    const chev = document.getElementById('personaChevron');
+    if (chev) chev.textContent = isHidden ? '▾' : '▸';
+  };
+
+  // Initialize selected persona from storage or default
+  const savedPersona = localStorage.getItem('selectedPersona');
+  if (!window.selectedPersona) window.selectedPersona = savedPersona || 'Curious Explorer';
+  window.personaTags = personaTagsMap[window.selectedPersona] || [];
+
+  personaList.forEach(p => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.style.marginBottom = '6px';
+    label.style.cursor = 'pointer';
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'personaChoice';
+    input.value = p;
+    input.checked = (p === window.selectedPersona);
+    input.style.marginRight = '8px';
+    input.onchange = () => {
+      if (!input.checked) return;
+      window.selectedPersona = p;
+      localStorage.setItem('selectedPersona', p);
+      window.personaTags = personaTagsMap[p] || [];
+      if (window.updateGraphFilters) window.updateGraphFilters();
+    };
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(p));
+    personaFilterDiv.appendChild(label);
+  });
+
   // Use fixed category list for toggles
   const allCategories = [
     'Social Justice & Rights',
@@ -275,23 +473,137 @@ function setupFilters(nodes) {
   selectedCategories = new Set(allCategories);
 
   const categoryFilter = document.getElementById('categoryFilter');
+  // Toolbar: reset filters (persona badge removed)
+  let toolbar = document.getElementById('filtersToolbar');
+  const makeResetBtn = () => {
+    const btn = document.createElement('button');
+    btn.id = 'resetFiltersBtn';
+    btn.textContent = 'Reset Filters';
+    btn.style.padding = '6px 10px';
+    btn.style.borderRadius = '8px';
+    btn.style.border = '1px solid #e2e8f0';
+    btn.style.background = '#fff';
+    btn.style.cursor = 'pointer';
+    btn.onmouseenter = () => btn.style.background = '#f8fafc';
+    btn.onmouseleave = () => btn.style.background = '#fff';
+    return btn;
+  };
+  if (!toolbar) {
+    toolbar = document.createElement('div');
+    toolbar.id = 'filtersToolbar';
+    toolbar.style.display = 'flex';
+    toolbar.style.alignItems = 'center';
+    toolbar.style.gap = '8px';
+    toolbar.style.flexWrap = 'wrap';
+    toolbar.style.margin = '8px 0 10px 0';
+    const resetBtn = makeResetBtn();
+    toolbar.appendChild(resetBtn);
+    // Place toolbar at the top of the controls
+    const personaHeaderEl = document.getElementById('personaHeader');
+    const controlsContainer = categoryFilter ? categoryFilter.parentNode : (document.querySelector('.graph-controls') || document.body);
+    if (personaHeaderEl && personaHeaderEl.parentNode) {
+      personaHeaderEl.parentNode.insertBefore(toolbar, personaHeaderEl);
+    } else if (controlsContainer.firstChild) {
+      controlsContainer.insertBefore(toolbar, controlsContainer.firstChild);
+    } else {
+      controlsContainer.appendChild(toolbar);
+    }
+  }
+
+  // Wire reset button behavior
+  const resetBtnEl = document.getElementById('resetFiltersBtn');
+  if (resetBtnEl) {
+    resetBtnEl.onclick = () => {
+      // Persona -> Curious Explorer (no filter)
+      window.selectedPersona = 'Curious Explorer';
+      localStorage.setItem('selectedPersona', 'Curious Explorer');
+      window.personaTags = [];
+      // Sync radios if present
+      document.querySelectorAll('input[name="personaChoice"]').forEach(r => {
+        r.checked = (r.value === 'Curious Explorer');
+      });
+  // Badge removed; no persona badge update needed
+      // Categories -> all selected
+      selectedCategories = new Set(allCategories);
+      if (categoryFilter) {
+        categoryFilter.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+      }
+      // Clear tag filter and search
+      const tagInput = document.getElementById('tagFilterInput');
+      if (tagInput) tagInput.value = '';
+      currentTagFilter = '';
+      const searchInput = document.getElementById('graphSearch');
+      if (searchInput) searchInput.value = '';
+      currentSearchTerm = '';
+      // Apply
+      if (window.updateGraphFilters) window.updateGraphFilters();
+    };
+  }
+  // Create a collapsible header for Categories placed right before the categoryFilter
+  let categoriesHeader = document.getElementById('categoriesHeaderJS');
+  if (!categoriesHeader && categoryFilter && categoryFilter.parentNode) {
+    categoriesHeader = document.createElement('div');
+    categoriesHeader.id = 'categoriesHeaderJS';
+    categoriesHeader.style.display = 'flex';
+    categoriesHeader.style.alignItems = 'center';
+    categoriesHeader.style.justifyContent = 'space-between';
+    categoriesHeader.style.cursor = 'pointer';
+    categoriesHeader.style.fontWeight = 'bold';
+    categoriesHeader.style.margin = '12px 0 6px 0';
+    categoriesHeader.style.padding = '6px 4px';
+    const label = document.createElement('span');
+    label.textContent = 'Categories';
+    const chevron = document.createElement('span');
+    chevron.id = 'categoriesChevron';
+    chevron.textContent = '▸';
+    categoriesHeader.appendChild(label);
+    categoriesHeader.appendChild(chevron);
+    categoryFilter.parentNode.insertBefore(categoriesHeader, categoryFilter);
+    // Collapsed by default
+    categoryFilter.style.display = 'none';
+    categoriesHeader.onclick = () => {
+      const isHidden = categoryFilter.style.display === 'none';
+      categoryFilter.style.display = isHidden ? 'block' : 'none';
+      const chev = document.getElementById('categoriesChevron');
+      if (chev) chev.textContent = isHidden ? '▾' : '▸';
+    };
+  }
   categoryFilter.innerHTML = '';
 
   allCategories.forEach(cat => {
     const label = document.createElement('label');
-    label.innerHTML = `
-      <input type="checkbox" checked onchange="filterGraph('${cat}')">
-      <span style="color: ${getCategoryColor(cat)}">●</span> ${cat}
-    `;
+    label.style.display = 'block';
+    label.style.marginBottom = '6px';
+    label.style.cursor = 'pointer';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = selectedCategories.has(cat);
+    checkbox.style.marginRight = '8px';
+    checkbox.onchange = () => {
+      if (selectedCategories.has(cat)) {
+        selectedCategories.delete(cat);
+      } else {
+        selectedCategories.add(cat);
+      }
+      if (window.updateGraphFilters) window.updateGraphFilters();
+    };
+    label.appendChild(checkbox);
+    const dot = document.createElement('span');
+    dot.textContent = '●';
+    dot.style.color = getCategoryColor(cat);
+    dot.style.fontWeight = 'bold';
+    dot.style.marginRight = '6px';
+    label.appendChild(dot);
+    label.appendChild(document.createTextNode(cat));
     categoryFilter.appendChild(label);
   });
-  
+
   // Tag filter
   document.getElementById('tagFilterInput').addEventListener('input', (e) => {
     currentTagFilter = e.target.value.toLowerCase();
     updateGraphFilters();
   });
-  
+
   // Search
   document.getElementById('graphSearch').addEventListener('input', (e) => {
     currentSearchTerm = e.target.value.toLowerCase();
@@ -313,27 +625,32 @@ window.filterGraph = function(category) {
 function updateGraphFilters() {
   const nodes = d3.selectAll('.node');
   const links = d3.selectAll('.link');
-  
+  const personaTags = window.personaTags || [];
+  const selectedPersona = window.selectedPersona;
   function isNodeVisible(d) {
+    // Persona filter
+    let personaMatch = true;
+    if (selectedPersona && selectedPersona !== 'Curious Explorer' && personaTags.length > 0) {
+      personaMatch = d.tags.some(tag => personaTags.some(ptag => tag.includes(ptag)));
+    }
+    // Category, tag, search filters
     const matchesCategory = d.categories.some(c => selectedCategories.has(c));
     const matchesTagFilter = !currentTagFilter || d.tags.some(t => t.toLowerCase().includes(currentTagFilter));
     const matchesSearchLabel = d.label.toLowerCase().includes(currentSearchTerm);
     const matchesSearchTags = d.tags.some(t => t.toLowerCase().includes(currentSearchTerm));
     const matchesSearch = !currentSearchTerm || matchesSearchLabel || matchesSearchTags;
-    
-    return matchesCategory && matchesTagFilter && matchesSearch;
+    return personaMatch && matchesCategory && matchesTagFilter && matchesSearch;
   }
-
   nodes.style('opacity', function(d) {
     return isNodeVisible(d) ? 1 : 0.1;
   });
-  
   links.style('opacity', function(d) {
     const sourceVisible = isNodeVisible(d.source);
     const targetVisible = isNodeVisible(d.target);
     return (sourceVisible && targetVisible) ? 0.3 : 0.05;
   });
 }
+window.updateGraphFilters = updateGraphFilters;
 
 // Zoom controls
 export function zoomIn() {
@@ -369,4 +686,13 @@ export function loadArchive() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => loadArchive());
+document.addEventListener('DOMContentLoaded', () => {
+  const savedPersona = localStorage.getItem('selectedPersona');
+  if (!savedPersona) {
+    showPersonaModal();
+  } else {
+    window.selectedPersona = savedPersona;
+    window.personaTags = window.personaTagsMap[savedPersona] || [];
+  }
+  loadArchive();
+});

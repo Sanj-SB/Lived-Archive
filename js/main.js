@@ -72,14 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('acceptedArtifacts', JSON.stringify(window.sampleArtifacts));
         }
     // Set up login button handler to redirect to admin page
-    document.getElementById('loginBtn').addEventListener('click', () => {
-        window.location.href = 'admin.html';
-    });
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            window.location.href = 'admin.html';
+        });
+    }
     
     // Set up submit artifact button handler
-    document.getElementById('submitArtifactBtn').addEventListener('click', () => {
-    window.showUserInfoModal();
-    });
+    const submitBtn = document.getElementById('submitArtifactBtn');
+    if (submitBtn && window.showUserInfoModal) {
+        submitBtn.addEventListener('click', () => {
+            window.showUserInfoModal();
+        });
+    }
     
     // Initialize admin functionality
     initializeAdmin();

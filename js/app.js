@@ -127,7 +127,42 @@ window.viewArtifactDetails = function(index, isPending) {
 
 // Accept artifact wrapper
 window.acceptArtifactHandler = function(index) {
-  adminAcceptArtifact(index, pendingArtifacts, acceptedArtifacts, () => {
+  adminAcceptArtifact(index, pendingArtifacts, acceptedArtifacts, async () => {
+    // Attempt to refetch from Supabase so the newly accepted row appears in graph
+    try {
+      const { data: acceptedRows, error: accErr } = await supabase
+        .from('accepted_artifacts')
+        .select('*')
+        .order('timestamp', { ascending: false });
+      if (!accErr && acceptedRows) {
+        const supabaseArtifacts = acceptedRows.map((r) => {
+          let publicFileUrl = r.file_url;
+          if (r.file_url && window.getPublicUrl && !r.file_url.startsWith('http')) {
+            publicFileUrl = window.getPublicUrl('artifacts', r.file_url);
+          }
+          return {
+            id: r.id,
+            title: r.title,
+            tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
+            timestamp: r.timestamp,
+            format: r.format,
+            textContent: r.text_content || null,
+            description: r.description || '',
+            file_url: publicFileUrl || null,
+            visual_url: publicFileUrl || '',
+            audio_url: '',
+            submitter: {
+              name: r.submitter_name || '',
+              email: r.submitter_email || '',
+              designation: r.submitter_designation || ''
+            }
+          };
+        });
+        acceptedArtifacts = supabaseArtifacts;
+      }
+    } catch (e) {
+      // If refetch fails, keep local array updated
+    }
     loadArchive(acceptedArtifacts);
   });
 };

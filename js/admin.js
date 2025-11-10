@@ -284,67 +284,117 @@ export function viewArtifactDetails(index, isPending, pendingArtifacts, accepted
   }
 // Accept artifact and move to archive
 export function acceptArtifact(index, pendingArtifacts, acceptedArtifacts, loadArchiveCallback) {
-  // Move the artifact from pending array to accepted array and sync with database
-  const artifact = pendingArtifacts.splice(index, 1)[0];
-  // Ensure file_url is copied to accepted artifact
-  if (!artifact.file_url && artifact.visual_url) {
-    artifact.file_url = artifact.visual_url;
+  // Do NOT remove from local pending until DB insert succeeds
+  const artifact = pendingArtifacts[index];
+  if (!artifact) {
+    alert('Artifact not found in the pending list.');
+    return;
   }
-  acceptedArtifacts.push(artifact);
+  // Keep a recovery reference for this session
+  window.__lastAcceptanceCandidate = artifact;
+  // Ensure URLs and timestamp
+  if (!artifact.file_url && artifact.visual_url) artifact.file_url = artifact.visual_url;
+  if (!artifact.timestamp) artifact.timestamp = artifact.created_at || new Date().toISOString();
 
-  // Try to update Supabase: remove from pending_artifacts and insert into accepted_artifacts
   (async () => {
     try {
-      // If artifact has an id (from DB), use it to delete; otherwise try to match by title+timestamp
-      const match = {};
-      if (artifact.id) {
-        match.id = artifact.id;
-      } else {
-        match.title = artifact.title;
-        match.timestamp = artifact.timestamp;
-      }
+      if (!window.supabase) throw new Error('Supabase client not available');
 
-      // Insert into accepted_artifacts table
-      if (window.supabase) {
-        const row = {
-          title: artifact.title,
-          description: artifact.description,
-          tags: artifact.tags,
-          submitter: artifact.submitter,
-          timestamp: artifact.timestamp,
-          format: artifact.format,
-          text_content: artifact.textContent || null,
-          file_url: artifact.file_url || artifact.visual_url || artifact.visualDataURL || null,
-          visual_url: artifact.visual_url || artifact.visualDataURL || null,
-          audio_url: artifact.audio_url || artifact.audioDataURL || null,
-          status: 'accepted'
-        };
-        const { data: insertData, error: insertErr } = await window.supabase.from('accepted_artifacts').insert([row]);
-        if (insertErr) console.error('Error inserting into accepted_artifacts:', insertErr);
+      // Prepare row for accepted_artifacts (match actual schema: single file_url, no audio_url/visual_url)
+      const row = {
+        title: artifact.title || null,
+        description: artifact.description || null,
+        tags: artifact.tags || [],
+        submitter_name: artifact.submitter?.name || null,
+        submitter_email: artifact.submitter?.email || null,
+        submitter_designation: artifact.submitter?.designation || null,
+        timestamp: artifact.timestamp,
+        format: artifact.format || null,
+        text_content: artifact.textContent || null,
+        file_url: artifact.file_url || artifact.visual_url || artifact.visualDataURL || null
+        // status column omitted unless it exists in your schema
+      };
 
-        // Delete from pending_artifacts if possible
-        if (match.id) {
-          const { error: delErr } = await window.supabase.from('pending_artifacts').delete().eq('id', match.id);
-          if (delErr) console.error('Error deleting pending artifact by id:', delErr);
+      // 1) Insert into accepted_artifacts
+      const { error: insertErr } = await window.supabase.from('accepted_artifacts').insert([row]);
+      if (insertErr) {
+        console.error('Insert into accepted_artifacts failed:', insertErr);
+        // If row already exists (duplicate primary key), treat as success and continue cleanup
+        if (insertErr.code === '23505') {
+          console.warn('Row already exists in accepted_artifacts; proceeding to remove from pending.');
         } else {
-          // Try deleting by title and timestamp
-          const { error: delErr } = await window.supabase.from('pending_artifacts').delete().match({ title: match.title, timestamp: match.timestamp });
-          if (delErr) console.error('Error deleting pending artifact by match:', delErr);
+          alert('Could not accept artifact (insert failed). Nothing was removed.');
+          return; // Abort: do not delete pending, do not change UI
         }
       }
+
+      // 2) Delete from pending_artifacts by id if present, else fallback to title+timestamp
+      if (artifact.id) {
+        const { error: delErr } = await window.supabase.from('pending_artifacts').delete().eq('id', artifact.id);
+        if (delErr) console.warn('Pending delete by id failed:', delErr);
+      } else {
+        const { error: delErr } = await window.supabase.from('pending_artifacts').delete().match({ title: artifact.title || null, timestamp: artifact.timestamp || null });
+        if (delErr) console.warn('Pending delete by match failed:', delErr);
+      }
+
+      // 3) Update local arrays and UI AFTER success
+      pendingArtifacts.splice(index, 1);
+      acceptedArtifacts.push(artifact);
+
+      // Update summary counts
+      const pendingEl = document.getElementById('summaryPending');
+      if (pendingEl) pendingEl.textContent = String(pendingArtifacts.length);
+      const acceptedEl = document.getElementById('summaryAccepted');
+      if (acceptedEl) {
+        const current = parseInt(acceptedEl.textContent || '0', 10);
+        acceptedEl.textContent = String(isNaN(current) ? 1 : current + 1);
+      }
+
+      alert('Artifact accepted and added to archive!');
+      closeModal();
+      loadReviewQueue(pendingArtifacts);
+      if (loadArchiveCallback) loadArchiveCallback();
     } catch (err) {
-      console.error('Error syncing acceptance with Supabase:', err);
+      console.error('Error during acceptance flow:', err);
+      alert('Acceptance failed due to an unexpected error. Nothing was removed.');
     }
   })();
+}
 
-  alert('Artifact accepted and added to archive!');
-  closeModal();
-  loadReviewQueue(pendingArtifacts);
+// Recovery helper: reinsert a previously attempted artifact back into pending_artifacts
+export async function recoverArtifactToPending(artifact) {
+  if (!artifact) artifact = window.__lastAcceptanceCandidate;
+  if (!artifact) throw new Error('No artifact available to recover');
+  if (!window.supabase) throw new Error('Supabase client not available');
+  const row = {
+    title: artifact.title || null,
+    description: artifact.description || null,
+    tags: artifact.tags || [],
+    submitter_name: artifact.submitter?.name || null,
+    submitter_email: artifact.submitter?.email || null,
+    submitter_designation: artifact.submitter?.designation || null,
+    timestamp: artifact.timestamp || artifact.created_at || new Date().toISOString(),
+    format: artifact.format || null,
+    text_content: artifact.textContent || null,
+    file_url: artifact.file_url || artifact.visual_url || artifact.visualDataURL || null,
+    visual_url: artifact.visual_url || artifact.visualDataURL || null,
+    audio_url: artifact.audio_url || artifact.audioDataURL || null,
+    status: 'pending'
+  };
+  const { error } = await window.supabase.from('pending_artifacts').insert([row]);
+  if (error) throw error;
+  return true;
+}
 
-  // Reload the archive if a callback is provided
-  if (loadArchiveCallback) {
-    loadArchiveCallback();
-  }
+if (typeof window !== 'undefined') {
+  window.recoverLastAccepted = async () => {
+    try {
+      await recoverArtifactToPending(window.__lastAcceptanceCandidate);
+      alert('Recovered the last accepted artifact back into pending. Refresh the page.');
+    } catch (e) {
+      alert('Recovery failed: ' + (e?.message || e));
+    }
+  };
 }
 
 // Close artifact modal

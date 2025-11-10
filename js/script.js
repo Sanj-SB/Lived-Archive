@@ -199,8 +199,17 @@ document.addEventListener('DOMContentLoaded', function() {
 initializeStorage();
 
 
-window.generateTags = generateTags;
-window.addCustomTag = addCustomTag;
+// Guard against undefined helpers if this file is included on pages without tagging features
+try {
+  if (typeof generateTags === 'function') {
+    window.generateTags = generateTags;
+  }
+  if (typeof addCustomTag === 'function') {
+    window.addCustomTag = addCustomTag;
+  }
+} catch (e) {
+  // no-op
+}
 
 
 window.submitArtifact = () => {
