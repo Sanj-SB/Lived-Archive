@@ -866,9 +866,7 @@ export function loadSampleData() {
 // Load archive
 export function loadArchive() {
   let acceptedArtifacts = getAcceptedArtifacts();
-  if (acceptedArtifacts.length === 0 && window.sampleArtifacts) {
-    acceptedArtifacts = window.sampleArtifacts;
-  }
+  // Only use uploaded artifacts; do not fallback to sampleArtifacts
   const nodes = acceptedArtifacts.map((artifact, index) => 
     artifactToNode(artifact, `artifact${index}`)
   );

@@ -6,6 +6,10 @@
   <title>Lived Archive - Home</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/graph-styles.css">
+  <!-- Load Roboto for inline font-family: 'Roboto' usages -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
@@ -35,10 +39,8 @@
     
     <!-- Network Graph View -->
     <div id="graphView" class="graph-container">
+      <!-- Left side: Tag filter and Search -->
       <div class="graph-controls">
-        <h3>Filters</h3>
-        <div class="category-filter" id="categoryFilter"></div>
-        
         <h3>Filter by Tag</h3>
         <input type="text" class="tag-filter-input" id="tagFilterInput" placeholder="Type tag name...">
         
@@ -46,11 +48,20 @@
         <input type="text" class="graph-search" id="graphSearch" placeholder="Search artifacts...">
       </div>
       
+      <!-- Right side: Personas and Categories (dynamically populated by JS) -->
+      <div class="graph-controls-right" id="rightSideControls">
+        <div class="category-filter" id="categoryFilter"></div>
+      </div>
+      
       <div class="zoom-controls">
         <button class="zoom-btn" onclick="zoomIn()">+</button>
         <button class="zoom-btn" onclick="zoomOut()">−</button>
         <button class="zoom-btn" onclick="resetZoom()">⟲</button>
       </div>
+      
+      <button class="timeline-toggle" id="timelineToggle" onclick="toggleTimeline()">
+        📅 Timeline View
+      </button>
       
       <svg id="networkGraph"></svg>
       <div id="nodeTooltip" class="node-tooltip"></div>

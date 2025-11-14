@@ -15,48 +15,7 @@ import {
 
 // State management
 let pendingArtifacts = [];
-let acceptedArtifacts = [
-  {
-    title: "Slum Jaggathu, edition 220",
-    tags: ["Print Publication (Magazine, Pamphlet, Zine)", "Alternative News / Reporting", "Media & Representation", "Education & Literacy"],
-    timestamp: "2025-12-31",
-    format: "text",
-    textContent: "Sample publication content",
-    description: "A community publication highlighting local issues and stories."
-  },
-  {
-    title: "Hidden Hunger in Plain Sight, Ambedkarian Chronicles",
-    tags: ["Text (Article, Essay, Letter)", "Resistance & Protest", "Awareness / Advocacy", "Social Justice"],
-    timestamp: "2025-11-15",
-    format: "text",
-    textContent: "Sample article content",
-    description: "An article exploring food insecurity and social justice."
-  },
-  {
-    title: "I Brought Ambedkar Home, Ambedkarian Chronicles",
-    tags: ["Oral Histories / Personal Narratives", "Text (Article, Essay, Letter)", "Memory & Commemoration", "Culture & Heritage"],
-    timestamp: "2025-10-20",
-    format: "text",
-    textContent: "Sample narrative content",
-    description: "A personal narrative about cultural heritage and identity."
-  },
-  {
-    title: "Arc.Bangalore",
-    tags: ["Community Organizing", "Social Media Post (Instagram, WhatsApp, Twitter, etc.)", "Awareness / Advocacy", "Urban Life & Infrastructure"],
-    timestamp: "2025-09-10",
-    format: "text",
-    textContent: "Sample social media content",
-    description: "Community organizing initiative in Bangalore."
-  },
-  {
-    title: "Studying Gender Without Caste Does the Subject a Disservice, The Wire",
-    tags: ["Text (Article, Essay, Letter)", "Awareness / Advocacy", "Social Justice", "Caste & Marginalization"],
-    timestamp: "2025-08-05",
-    format: "text",
-    textContent: "Sample article content",
-    description: "An analysis of intersectionality in academic discourse."
-  }
-];
+let acceptedArtifacts = [];
 
 let currentSubmitterInfo = null;
 
