@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: r.title,
             tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
             timestamp: r.timestamp,
+            date_created: r.date_created || null, // User-entered creation date from Supabase
             format: r.format,
             textContent: r.text_content || null,
             description: r.description || '',
@@ -224,6 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
             created_at: r.created_at,
             title: r.title,
             tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
+            timestamp: r.timestamp,
+            date_created: r.date_created || null, // User-entered creation date from Supabase
             description: r.description || '',
             format: r.format || '',
             textContent: r.text_content || '',

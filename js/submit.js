@@ -447,6 +447,7 @@ export function submitArtifact(currentSubmitterInfo, pendingArtifacts) {
     description: combinedDescription,
     submitter: currentSubmitterInfo,
     timestamp: new Date().toISOString(),
+    date_created: date, // User-entered creation date
     format: format,
     textContent: textContent,
     visualFile: selectedVisualFile,
@@ -533,6 +534,7 @@ async function finalizeSubmission(pendingArtifacts) {
       submitter_email: submitter.email || '',
       submitter_designation: submitter.designation || '',
       timestamp: currentArtifactData.timestamp,
+      date_created: currentArtifactData.date_created || null, // User-entered creation date
       format: currentArtifactData.format,
       text_content: currentArtifactData.textContent || null,
       file_url: file_url

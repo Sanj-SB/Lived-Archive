@@ -74,7 +74,7 @@ function showPersonaModal() {
   subtitle.style.margin = '0 0 16px 0';
   subtitle.style.color = '#555';
 
-  const options = ['Advocate', 'Artist', 'Researcher', 'Educator', 'Curious Explorer'];
+  const options = ['Curious Explorer','Advocate', 'Artist', 'Researcher', 'Educator'];
   const grid = document.createElement('div');
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(160px, 1fr))';
@@ -85,12 +85,19 @@ function showPersonaModal() {
     btn.type = 'button';
     btn.textContent = p;
     btn.style.padding = '10px 12px';
-    btn.style.borderRadius = '8px';
-    btn.style.border = '1px solid #e2e8f0';
-    btn.style.background = '#f8fafc';
+    btn.style.borderRadius = '20px';
+    btn.style.border = '1px solid #514575';
+    btn.style.background = '#fff';
+    btn.style.color = '#514575'; // base text color
     btn.style.cursor = 'pointer';
-    btn.onmouseenter = () => btn.style.background = '#eef2f7';
-    btn.onmouseleave = () => btn.style.background = '#f8fafc';
+    btn.onmouseenter = () => {
+      btn.style.background = '#514575';
+      btn.style.color = '#fff';          // hover text color
+    };
+    btn.onmouseleave = () => {
+      btn.style.background = '#fff';
+      btn.style.color = '#514575';       // restore base text color
+    };
     btn.onclick = () => {
       window.selectedPersona = p;
       localStorage.setItem('selectedPersona', p);
@@ -98,6 +105,13 @@ function showPersonaModal() {
       // If radios exist, sync them
       const radio = document.querySelector(`input[name="personaChoice"][value="${p}"]`);
       if (radio) radio.checked = true;
+      // If sidebar persona buttons exist, sync their visual state
+      document.querySelectorAll('button[data-persona]').forEach(b => {
+        const isSelected = b.dataset.persona === p;
+        b.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        b.style.background = isSelected ? '#514575' : '#fff';
+        b.style.color = isSelected ? '#fff' : '#514575';
+      });
       if (window.updateGraphFilters) window.updateGraphFilters();
       if (window.updatePersonaBadge) window.updatePersonaBadge();
       document.body.removeChild(overlay);
@@ -120,6 +134,12 @@ let zoom = null;
 let selectedCategories = new Set();
 let currentTagFilter = '';
 let currentSearchTerm = '';
+let isTimelineView = false;
+let currentNodes = [];
+let currentLinks = [];
+let nodeElements = null;
+let linkElements = null;
+let dateLabels = null;
 
 // Convert artifact to node
 function artifactToNode(artifact, id) {
@@ -166,12 +186,25 @@ function artifactToNode(artifact, id) {
   
   if (categories.size === 0) categories.add('Other');
   
+  // Parse the date_created field (YYYY-MM-DD format from date input)
+  let creationDate = new Date();
+  let displayDate = 'Unknown';
+  
+  if (artifact.date_created) {
+    creationDate = new Date(artifact.date_created);
+    displayDate = creationDate.toLocaleDateString();
+  } else if (artifact.timestamp) {
+    creationDate = new Date(artifact.timestamp);
+    displayDate = creationDate.toLocaleDateString();
+  }
+  
   return {
     id: id,
     label: artifact.title || 'Untitled',
     categories: Array.from(categories),
     tags: artifact.tags,
-    created: artifact.timestamp ? new Date(artifact.timestamp).toLocaleDateString() : 'Unknown',
+    created: displayDate,
+    timestamp: creationDate,
     artifact: artifact
   };
 }
@@ -237,6 +270,12 @@ function initializeGraph(nodes, links) {
     .attr('width', width)
     .attr('height', height);
   
+  // Add background color (matches page background)
+  svg.append('rect')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('fill', '#f5f5f0');
+  
   // Add zoom behavior
   zoom = d3.zoom()
     .scaleExtent([0.1, 4])
@@ -257,14 +296,14 @@ function initializeGraph(nodes, links) {
     .alphaDecay(0.01);
 
   // Draw links
-  const link = g.append('g')
+  linkElements = g.append('g')
     .selectAll('line')
     .data(links)
     .join('line')
     .attr('class', 'link');
 
   // Draw nodes with fade-in
-  const node = g.append('g')
+  nodeElements = g.append('g')
     .selectAll('circle')
     .data(nodes)
     .join('circle')
@@ -284,21 +323,37 @@ function initializeGraph(nodes, links) {
       if (index !== -1) viewArtifactDetails(index, false);
     });
 
-  node.transition().duration(400).attr('opacity', 1);
+  nodeElements.transition().duration(400).attr('opacity', 1);
+
+  // Create date labels (hidden by default)
+  dateLabels = g.append('g')
+    .selectAll('text')
+    .data(nodes)
+    .join('text')
+    .attr('class', 'node-date-label')
+    .text(d => d.created)
+    .attr('opacity', 0);
+
+  // Store references for timeline toggle
+  currentNodes = nodes;
+  currentLinks = links;
 
   simulation.nodes(nodes);
   simulation.force('link').links(links);
   simulation.alpha(1).restart();
 
   simulation.on('tick', () => {
-    link
+    linkElements
       .attr('x1', d => d.source.x)
       .attr('y1', d => d.source.y)
       .attr('x2', d => d.target.x)
       .attr('y2', d => d.target.y);
-    node
+    nodeElements
       .attr('cx', d => d.x)
       .attr('cy', d => d.y);
+    dateLabels
+      .attr('x', d => d.x)
+      .attr('y', d => d.y + 35);
   });
   
   // Drag functions
@@ -375,27 +430,107 @@ function hideTooltip() {
   document.getElementById('nodeTooltip').classList.remove('active');
 }
 
+// Timeline layout function
+function applyTimelineLayout() {
+  if (!nodeElements || !simulation) return;
+  
+  const container = document.getElementById('graphView');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  
+  // Sort nodes by timestamp
+  const sortedNodes = [...currentNodes].sort((a, b) => a.timestamp - b.timestamp);
+  
+  // Calculate positions
+  const padding = 100;
+  const yPos = height / 2;
+  const spacing = (width - 2 * padding) / Math.max(sortedNodes.length - 1, 1);
+  
+  // Stop the simulation
+  simulation.stop();
+  
+  // Position nodes along timeline
+  sortedNodes.forEach((node, i) => {
+    node.fx = padding + i * spacing;
+    node.fy = yPos;
+  });
+  
+  // Animate to new positions
+  nodeElements
+    .transition()
+    .duration(800)
+    .attr('cx', d => d.fx)
+    .attr('cy', d => d.fy);
+  
+  linkElements
+    .transition()
+    .duration(800)
+    .attr('x1', d => d.source.fx)
+    .attr('y1', d => d.source.fy)
+    .attr('x2', d => d.target.fx)
+    .attr('y2', d => d.target.fy);
+  
+  dateLabels
+    .transition()
+    .duration(800)
+    .attr('x', d => d.fx)
+    .attr('y', d => d.fy + 35)
+    .attr('opacity', 1);
+}
+
+// Restore force-directed layout
+function applyForceLayout() {
+  if (!nodeElements || !simulation) return;
+  
+  // Remove fixed positions
+  currentNodes.forEach(node => {
+    node.fx = null;
+    node.fy = null;
+  });
+  
+  // Hide date labels
+  dateLabels
+    .transition()
+    .duration(400)
+    .attr('opacity', 0);
+  
+  // Restart simulation
+  simulation.alpha(0.5).restart();
+}
+
+// Toggle between timeline and force layout
+window.toggleTimeline = function() {
+  const toggleBtn = document.getElementById('timelineToggle');
+  isTimelineView = !isTimelineView;
+  
+  if (isTimelineView) {
+    toggleBtn.classList.add('active');
+    toggleBtn.textContent = '🔀 Network View';
+    applyTimelineLayout();
+  } else {
+    toggleBtn.classList.remove('active');
+    toggleBtn.textContent = '📅 Timeline View';
+    applyForceLayout();
+  }
+}
+
 // Setup filters
 function setupFilters(nodes) {
   // Persona radios (single-select) styled like category list
-  const personaList = ['Advocate', 'Artist', 'Researcher', 'Educator', 'Curious Explorer'];
+  const personaList = ['Curious Explorer', 'Advocate', 'Artist', 'Researcher', 'Educator'];
   const personaTagsMap = window.personaTagsMap || {};
   let personaFilterDiv = document.getElementById('personaFilter');
   if (!personaFilterDiv) {
     personaFilterDiv = document.createElement('div');
     personaFilterDiv.id = 'personaFilter';
     personaFilterDiv.style.marginBottom = '18px';
-    const sidebar = document.getElementById('sidebar') || document.getElementById('leftSidebar') || document.body;
-    // Try to place above categories if possible; use the category's actual parent to avoid NotFoundError
+    // Insert into right-side controls above categories
+    const rightSideControls = document.getElementById('rightSideControls');
     const categoryContainer = document.getElementById('categoryFilter');
-    if (categoryContainer && categoryContainer.parentNode) {
-      categoryContainer.parentNode.insertBefore(personaFilterDiv, categoryContainer);
-    } else if (sidebar) {
-      if (sidebar.firstChild) {
-        sidebar.insertBefore(personaFilterDiv, sidebar.firstChild);
-      } else {
-        sidebar.appendChild(personaFilterDiv);
-      }
+    if (rightSideControls && categoryContainer) {
+      rightSideControls.insertBefore(personaFilterDiv, categoryContainer);
+    } else if (rightSideControls) {
+      rightSideControls.appendChild(personaFilterDiv);
     }
   }
   personaFilterDiv.innerHTML = '';
@@ -437,29 +572,53 @@ function setupFilters(nodes) {
   if (!window.selectedPersona) window.selectedPersona = savedPersona || 'Curious Explorer';
   window.personaTags = personaTagsMap[window.selectedPersona] || [];
 
-  personaList.forEach(p => {
-    const label = document.createElement('label');
-    label.style.display = 'block';
-    label.style.marginBottom = '6px';
-    label.style.cursor = 'pointer';
+  // Render pill-style persona buttons similar to the modal
+  const personaGrid = document.createElement('div');
+  personaGrid.style.display = 'grid';
+  personaGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(160px, 1fr))';
+  personaGrid.style.gap = '10px';
 
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'personaChoice';
-    input.value = p;
-    input.checked = (p === window.selectedPersona);
-    input.style.marginRight = '8px';
-    input.onchange = () => {
-      if (!input.checked) return;
+  function stylePersonaButton(btn, selected) {
+    btn.style.padding = '10px 12px';
+    btn.style.borderRadius = '20px';
+    btn.style.border = '1px solid #514575';
+    btn.style.background = selected ? '#514575' : '#fff';
+    btn.style.color = selected ? '#fff' : '#514575';
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'background 0.18s ease, color 0.18s ease';
+    btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  }
+
+  personaList.forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.dataset.persona = p;
+    btn.textContent = p;
+    stylePersonaButton(btn, p === window.selectedPersona);
+    btn.onmouseenter = () => {
+      btn.style.background = '#514575';
+      btn.style.color = '#fff';
+    };
+    btn.onmouseleave = () => {
+      const isSelected = (p === window.selectedPersona);
+      btn.style.background = isSelected ? '#514575' : '#fff';
+      btn.style.color = isSelected ? '#fff' : '#514575';
+    };
+    btn.onclick = () => {
       window.selectedPersona = p;
       localStorage.setItem('selectedPersona', p);
       window.personaTags = personaTagsMap[p] || [];
+      // Update styles for all persona buttons in this grid
+      personaFilterDiv.querySelectorAll('button[data-persona]').forEach(b => {
+        const selected = b.dataset.persona === window.selectedPersona;
+        stylePersonaButton(b, selected);
+      });
       if (window.updateGraphFilters) window.updateGraphFilters();
     };
-    label.appendChild(input);
-    label.appendChild(document.createTextNode(p));
-    personaFilterDiv.appendChild(label);
+    personaGrid.appendChild(btn);
   });
+
+  personaFilterDiv.appendChild(personaGrid);
 
   // Use fixed category list for toggles
   const allCategories = [
@@ -498,15 +657,15 @@ function setupFilters(nodes) {
     toolbar.style.margin = '8px 0 10px 0';
     const resetBtn = makeResetBtn();
     toolbar.appendChild(resetBtn);
-    // Place toolbar at the top of the controls
+    // Place toolbar at the top of the right-side controls
     const personaHeaderEl = document.getElementById('personaHeader');
-    const controlsContainer = categoryFilter ? categoryFilter.parentNode : (document.querySelector('.graph-controls') || document.body);
+    const rightSideControls = document.getElementById('rightSideControls');
     if (personaHeaderEl && personaHeaderEl.parentNode) {
       personaHeaderEl.parentNode.insertBefore(toolbar, personaHeaderEl);
-    } else if (controlsContainer.firstChild) {
-      controlsContainer.insertBefore(toolbar, controlsContainer.firstChild);
-    } else {
-      controlsContainer.appendChild(toolbar);
+    } else if (rightSideControls && rightSideControls.firstChild) {
+      rightSideControls.insertBefore(toolbar, rightSideControls.firstChild);
+    } else if (rightSideControls) {
+      rightSideControls.appendChild(toolbar);
     }
   }
 
@@ -521,6 +680,13 @@ function setupFilters(nodes) {
       // Sync radios if present
       document.querySelectorAll('input[name="personaChoice"]').forEach(r => {
         r.checked = (r.value === 'Curious Explorer');
+      });
+      // Sync sidebar persona buttons if present
+      personaFilterDiv.querySelectorAll('button[data-persona]').forEach(b => {
+        const selected = b.dataset.persona === 'Curious Explorer';
+        b.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        b.style.background = selected ? '#514575' : '#fff';
+        b.style.color = selected ? '#fff' : '#514575';
       });
   // Badge removed; no persona badge update needed
       // Categories -> all selected
@@ -571,31 +737,57 @@ function setupFilters(nodes) {
   categoryFilter.innerHTML = '';
 
   allCategories.forEach(cat => {
-    const label = document.createElement('label');
-    label.style.display = 'block';
-    label.style.marginBottom = '6px';
-    label.style.cursor = 'pointer';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = selectedCategories.has(cat);
-    checkbox.style.marginRight = '8px';
-    checkbox.onchange = () => {
-      if (selectedCategories.has(cat)) {
-        selectedCategories.delete(cat);
-      } else {
-        selectedCategories.add(cat);
-      }
-      if (window.updateGraphFilters) window.updateGraphFilters();
-    };
-    label.appendChild(checkbox);
+    // Custom checkbox with SVG icons
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.marginBottom = '6px';
+    wrapper.style.cursor = 'pointer';
+    wrapper.setAttribute('role', 'checkbox');
+    wrapper.setAttribute('aria-checked', selectedCategories.has(cat) ? 'true' : 'false');
+    wrapper.setAttribute('tabindex', '0');
+
+    const icon = document.createElement('img');
+    icon.src = selectedCategories.has(cat) ? 'assets/checkbox-filled.svg' : 'assets/checkbox-unfilled.svg';
+    icon.alt = selectedCategories.has(cat) ? 'Selected' : 'Not selected';
+    icon.style.width = '20px';
+    icon.style.height = '20px';
+    icon.style.marginRight = '8px';
+
     const dot = document.createElement('span');
     dot.textContent = '●';
     dot.style.color = getCategoryColor(cat);
     dot.style.fontWeight = 'bold';
     dot.style.marginRight = '6px';
-    label.appendChild(dot);
-    label.appendChild(document.createTextNode(cat));
-    categoryFilter.appendChild(label);
+
+    const labelText = document.createElement('span');
+    labelText.textContent = cat;
+
+    function toggleCategory() {
+      if (selectedCategories.has(cat)) {
+        selectedCategories.delete(cat);
+      } else {
+        selectedCategories.add(cat);
+      }
+      const isSelected = selectedCategories.has(cat);
+      icon.src = isSelected ? 'assets/checkbox-filled.svg' : 'assets/checkbox-unfilled.svg';
+      icon.alt = isSelected ? 'Selected' : 'Not selected';
+      wrapper.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+      if (window.updateGraphFilters) window.updateGraphFilters();
+    }
+
+    wrapper.onclick = toggleCategory;
+    wrapper.onkeydown = (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleCategory();
+      }
+    };
+
+    wrapper.appendChild(icon);
+    wrapper.appendChild(dot);
+    wrapper.appendChild(labelText);
+    categoryFilter.appendChild(wrapper);
   });
 
   // Tag filter

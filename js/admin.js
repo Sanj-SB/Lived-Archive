@@ -309,6 +309,7 @@ export function acceptArtifact(index, pendingArtifacts, acceptedArtifacts, loadA
         submitter_email: artifact.submitter?.email || null,
         submitter_designation: artifact.submitter?.designation || null,
         timestamp: artifact.timestamp,
+        date_created: artifact.date_created || null, // User-entered creation date
         format: artifact.format || null,
         text_content: artifact.textContent || null,
         file_url: artifact.file_url || artifact.visual_url || artifact.visualDataURL || null

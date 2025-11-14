@@ -25,6 +25,11 @@ body {
   border-bottom: 1px solid #e0e0e0;
 }
 
+/* Ensure Roboto is used for specific labels in user info modal */
+#userInfoModal label {
+  font-family: 'Roboto', sans-serif;
+}
+
 /* No logo in header per latest design */
 
 /* Navbar layout helpers for new design */

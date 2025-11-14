@@ -1,0 +1,367 @@
+# Query: font
+# ContextLines: 1
+
+138 results - 8 files
+
+admin.html:
+  82            <div>
+  83:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name *</label>
+  84:             <input type="text" id="submitterName" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  85            </div>
+  86            <div>
+  87:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Email ID *</label>
+  88:             <input type="email" id="submitterEmail" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  89            </div>
+  90            <div>
+  91:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Designation/Relation to collectives/organisation (Optional)</label>
+  92:             <input type="text" id="submitterDesignation" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  93            </div>
+
+index.html:
+   80            <div>
+   81:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name *</label>
+   82:             <input type="text" id="submitterName" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Roboto', sans-serif;">
+   83            </div>
+   84            <div>
+   85:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Email ID *</label>
+   86:             <input type="email" id="submitterEmail" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Roboto', sans-serif;">
+   87            </div>
+   88            <div>
+   89:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Designation/Relation to collectives/organisation (Optional)</label>
+   90:             <input type="text" id="submitterDesignation" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Roboto', sans-serif">
+   91            </div>
+
+  108            <div>
+  109:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Username</label>
+  110:             <input type="text" id="loginUsername" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  111            </div>
+  112            <div>
+  113:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Password</label>
+  114:             <input type="password" id="loginPassword" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  115            </div>
+
+submit.html:
+  135          <div>
+  136:           <label style="display: block; margin-bottom: 8px; font-weight: bold;">Title *</label>
+  137:           <input type="text" id="artifactTitle" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  138          </div>
+  139          <div>
+  140:           <label style="display: block; margin-bottom: 8px; font-weight: bold;">Date the Artifact was created *</label>
+  141:           <input type="date" id="artifactDate" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  142          </div>
+  143          <div>
+  144:           <label style="display: block; margin-bottom: 8px; font-weight: bold;">Created By *</label>
+  145:           <input type="text" id="artifactCreator" placeholder="Who created this? If it was someone other than you, please credit them here!" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  146          </div>
+  147          <div>
+  148:           <label style="display: block; margin-bottom: 8px; font-weight: bold;">Why It Was Created *</label>
+  149:           <textarea id="artifactPurpose" placeholder="What makes this an important piece? Why did you make it?" style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
+  150          </div>
+  151          <div>
+  152:           <label style="display: block; margin-bottom: 8px; font-weight: bold;">General Description *</label>
+  153:           <textarea id="artifactDescription" placeholder="Tell us where this came from, was it passed down? How did you make it? Any other things that tell the story of your artifact!" style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif; resize: vertical;"></textarea>
+  154          </div>
+  155          <div>
+  156:           <label style="display: block; margin-bottom: 8px; font-weight: bold;">URL (Optional)</label>
+  157:           <input type="url" id="artifactURL" placeholder="https://example.com" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;">
+  158          </div>
+
+  177            <div>
+  178:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name *</label>
+  179:             <input type="text" id="submitterName" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Roboto', sans-serif;">
+  180            </div>
+  181            <div>
+  182:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Email ID *</label>
+  183:             <input type="email" id="submitterEmail" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Roboto', sans-serif;">
+  184            </div>
+  185            <div>
+  186:             <label style="display: block; margin-bottom: 8px; font-weight: bold;">Designation/Relation to collectives/organisation (Optional)</label>
+  187:             <input type="text" id="submitterDesignation" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Roboto', sans-serif;">
+  188            </div>
+
+css/admin-styles.css:
+   32  .login-box h1 {
+   33:   font-size: 36px;
+   34:   font-weight: normal;
+   35    margin-bottom: 15px;
+
+   40    margin-bottom: 40px;
+   41:   font-style: italic;
+   42  }
+
+   56    margin-bottom: 8px;
+   57:   font-weight: bold;
+   58:   font-size: 14px;
+   59  }
+
+   65    border-radius: 10px;
+   66:   font-size: 16px;
+   67:   font-family: 'Georgia', serif;
+   68  }
+
+   80    border-radius: 8px;
+   81:   font-size: 14px;
+   82  }
+
+   97  .admin-summary h2 {
+   98:   font-size: 22px;
+   99:   font-weight: normal;
+  100    margin-bottom: 16px;
+
+  102  .admin-summary-intro {
+  103:   font-size: 14px;
+  104    line-height: 1.6;
+
+  106    margin: 0 0 18px 0;
+  107:   font-style: italic;
+  108  }
+
+  120  .summary-card h3 {
+  121:   font-size: 16px;
+  122:   font-weight: normal;
+  123    color: #555;
+
+  126  .summary-number {
+  127:   font-size: 28px;
+  128    line-height: 1;
+
+  132    color: #777;
+  133:   font-size: 13px;
+  134  }
+
+  144  .review-header h1 {
+  145:   font-size: 48px;
+  146:   font-weight: normal;
+  147    margin-bottom: 10px;
+
+  151    color: #666;
+  152:   font-size: 16px;
+  153  }
+
+  224  .artifact-card-content h3 {
+  225:   font-size: 24px;
+  226    margin-bottom: 15px;
+  227:   font-weight: normal;
+  228  }
+
+  249  .no-artifacts h3 {
+  250:   font-size: 24px;
+  251    margin-bottom: 10px;
+  252:   font-weight: normal;
+  253  }
+
+  269    cursor: pointer;
+  270:   font-size: 18px;
+  271    transition: background 0.3s;
+  272:   font-family: 'Georgia', serif;
+  273  }
+
+  285    cursor: not-allowed;
+  286:   font-size: 18px;
+  287:   font-family: 'Georgia', serif;
+  288  }
+
+css/graph-styles.css:
+   28  .graph-controls h3 {
+   29:   font-size: 18px;
+   30    margin-bottom: 10px;
+   31:   font-weight: normal;
+   32  }
+
+   44    cursor: pointer;
+   45:   font-size: 14px;
+   46  }
+
+   56    border-radius: 10px;
+   57:   font-size: 14px;
+   58  }
+
+   64    border-radius: 10px;
+   65:   font-size: 14px;
+   66  }
+
+  101    margin: 0 0 10px 0;
+  102:   font-size: 16px;
+  103:   font-weight: normal;
+  104  }
+
+  107    color: #666;
+  108:   font-size: 12px;
+  109    margin-bottom: 8px;
+
+  116    margin-bottom: 8px;
+  117:   font-size: 13px;
+  118  }
+
+  126  .node-tooltip .tag {
+  127:   font-size: 11px;
+  128    padding: 4px 10px;
+
+  147    cursor: pointer;
+  148:   font-size: 20px;
+  149    display: flex;
+
+css/style.css:
+    7  body {
+    8:   font-family: 'Georgia', serif;
+    9    background: #f5f5f0;
+
+   48    border: none;
+   49:   font-size: 28px;
+   50    cursor: pointer;
+
+   73    padding: 10px 20px;
+   74:   font-family: 'Georgia', serif;
+   75:   font-size: 15px;
+   76    cursor: pointer;
+
+  103    cursor: pointer;
+  104:   font-size: 16px;
+  105    transition: background 0.3s;
+  106:   font-family: 'Georgia', serif;
+  107  }
+
+  122    border-radius: 25px;
+  123:   font-size: 16px;
+  124    background: white;
+
+  144  .date-text {
+  145:   font-size: 14px;
+  146    color: #666;
+
+  150  .home-header h1 {
+  151:   font-size: 48px;
+  152:   font-weight: normal;
+  153    margin-bottom: 15px;
+
+  157  .home-header p {
+  158:   font-size: 16px;
+  159    color: #666;
+  160:   font-style: italic;
+  161  }
+
+  190  .graph-controls h3 {
+  191:   font-size: 18px;
+  192    margin-bottom: 10px;
+  193:   font-weight: normal;
+  194  }
+
+  206    cursor: pointer;
+  207:   font-size: 14px;
+  208  }
+
+  218    border-radius: 10px;
+  219:   font-size: 14px;
+  220  }
+
+  226    border-radius: 10px;
+  227:   font-size: 14px;
+  228  }
+
+  260    margin: 0 0 10px 0;
+  261:   font-size: 16px;
+  262:   font-weight: normal;
+  263  }
+
+  266    color: #666;
+  267:   font-size: 12px;
+  268    margin-bottom: 8px;
+
+  275    margin-bottom: 8px;
+  276:   font-size: 13px;
+  277  }
+
+  285  .node-tooltip .tag {
+  286:   font-size: 11px;
+  287    padding: 4px 10px;
+
+  306    cursor: pointer;
+  307:   font-size: 20px;
+  308    display: flex;
+
+  323    border-radius: 20px;
+  324:   font-size: 14px;
+  325    cursor: pointer;
+
+  386    border: none;
+  387:   font-size: 24px;
+  388    cursor: pointer;
+
+  407  .artifact-section h3 {
+  408:   font-size: 20px;
+  409    margin-bottom: 15px;
+  410:   font-weight: normal;
+  411  }
+
+css/submit-style.css:
+    7  .submit-header h1 {
+    8:   font-size: 48px;
+    9:   font-weight: normal;
+   10    margin-bottom: 15px;
+
+   13  .submit-header p {
+   14:   font-size: 16px;
+   15    color: #666;
+   16:   font-style: italic;
+   17  }
+
+   47  .upload-box h3 {
+   48:   font-size: 24px;
+   49    margin-bottom: 20px;
+   50:   font-weight: normal;
+   51  }
+
+   54    color: #999;
+   55:   font-size: 16px;
+   56  }
+
+   63    margin-top: 12px;
+   64:   font-size: 16px;
+   65    text-align: center;
+
+   68    padding: 6px 0;
+   69:   font-family: 'Georgia', serif;
+   70  }
+
+   81    border-radius: 20px;
+   82:   font-size: 16px;
+   83:   font-family: 'Georgia', serif;
+   84    resize: vertical;
+
+  131    margin-bottom: 10px;
+  132:   font-size: 14px;
+  133  }
+
+  162  .tag-category h3 {
+  163:   font-size: 20px;
+  164    margin-bottom: 15px;
+  165:   font-weight: normal;
+  166  }
+
+  201    border-radius: 20px;
+  202:   font-size: 14px;
+  203  }
+
+  240  .description-section h3 {
+  241:   font-size: 24px;
+  242    margin-bottom: 15px;
+  243:   font-weight: normal;
+  244  }
+
+  251    border-radius: 15px;
+  252:   font-size: 16px;
+  253:   font-family: 'Georgia', serif;
+  254    resize: vertical;
+
+js/graph.js:
+  430      personaHeader.style.cursor = 'pointer';
+  431:     personaHeader.style.fontWeight = 'bold';
+  432      personaHeader.style.margin = '8px 0';
+
+  601      categoriesHeader.style.cursor = 'pointer';
+  602:     categoriesHeader.style.fontWeight = 'bold';
+  603      categoriesHeader.style.margin = '12px 0 6px 0';
+
+  644      dot.style.color = getCategoryColor(cat);
+  645:     dot.style.fontWeight = 'bold';
+  646      dot.style.marginRight = '6px';
