@@ -343,21 +343,27 @@ function initializeGraph(nodes, links) {
   simulation.alpha(1).restart();
 
   simulation.on('tick', () => {
-    linkElements
-      .attr('x1', d => d.source.x)
-      .attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x)
-      .attr('y2', d => d.target.y);
-    nodeElements
-      .attr('cx', d => d.x)
-      .attr('cy', d => d.y);
-    dateLabels
-      .attr('x', d => d.x)
-      .attr('y', d => d.y + 35);
+    // Only update positions if not in timeline view
+    if (!isTimelineView) {
+      linkElements
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+      nodeElements
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y);
+      dateLabels
+        .attr('x', d => d.x)
+        .attr('y', d => d.y + 35);
+    }
   });
   
   // Drag functions
   function dragstarted(event, d) {
+    // Don't allow dragging in timeline view
+    if (isTimelineView) return;
+    
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
@@ -365,12 +371,18 @@ function initializeGraph(nodes, links) {
   }
 
   function dragged(event, d) {
+    // Don't allow dragging in timeline view
+    if (isTimelineView) return;
+    
     d.fx = event.x;
     d.fy = event.y;
     showTooltip(event, d);
   }
 
   function dragended(event, d) {
+    // Don't allow dragging in timeline view
+    if (isTimelineView) return;
+    
     if (!event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
@@ -446,35 +458,38 @@ function applyTimelineLayout() {
   const yPos = height / 2;
   const spacing = (width - 2 * padding) / Math.max(sortedNodes.length - 1, 1);
   
-  // Stop the simulation
+  // Stop the simulation completely
   simulation.stop();
+  simulation.alpha(0);
   
-  // Position nodes along timeline
+  // Position nodes along timeline with fixed positions
   sortedNodes.forEach((node, i) => {
     node.fx = padding + i * spacing;
     node.fy = yPos;
+    node.x = node.fx;
+    node.y = node.fy;
   });
   
-  // Animate to new positions
+  // Update positions immediately without transition for links
+  linkElements
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+  
+  // Animate nodes to new positions
   nodeElements
     .transition()
-    .duration(800)
-    .attr('cx', d => d.fx)
-    .attr('cy', d => d.fy);
+    .duration(1500)
+    .attr('cx', d => d.x)
+    .attr('cy', d => d.y);
   
-  linkElements
-    .transition()
-    .duration(800)
-    .attr('x1', d => d.source.fx)
-    .attr('y1', d => d.source.fy)
-    .attr('x2', d => d.target.fx)
-    .attr('y2', d => d.target.fy);
-  
+  // Show date labels
   dateLabels
+    .attr('x', d => d.x)
+    .attr('y', d => d.y + 35)
     .transition()
-    .duration(800)
-    .attr('x', d => d.fx)
-    .attr('y', d => d.fy + 35)
+    .duration(150)
     .attr('opacity', 1);
 }
 
@@ -491,10 +506,10 @@ function applyForceLayout() {
   // Hide date labels
   dateLabels
     .transition()
-    .duration(400)
+    .duration(150)
     .attr('opacity', 0);
   
-  // Restart simulation
+  // Restart simulation with fresh alpha
   simulation.alpha(0.5).restart();
 }
 

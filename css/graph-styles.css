@@ -99,7 +99,7 @@
   cursor: pointer;
   stroke: #fff;
   stroke-width: 3px; 
-  transition: all 0.2s ease-in-out; /* Keep the smooth transition */
+  transition: all 0.01s ease-in-out; 
 }
 
 /* REMOVED the .node:hover rule that caused flickering */
@@ -201,7 +201,7 @@
   font-weight: 500;
   color: #514575;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.5s ease, color 0.5s ease;
 }
 
 .timeline-toggle:hover {

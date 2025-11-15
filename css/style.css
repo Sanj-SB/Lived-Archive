@@ -236,7 +236,7 @@ a[aria-current="page"], .nav-left .btn.link-home[href="index.html"]:focus {
   cursor: pointer;
   stroke: #fff;
   stroke-width: 3px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.05s ease-in-out;
 }
 
 .link {
