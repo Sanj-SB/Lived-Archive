@@ -151,7 +151,6 @@ function displayFilePreview() {
 }
 
 // Generate AI-suggested tags
-// Generate AI-suggested tags
 export async function generateTags() {
 // Expose generateTags globally for inline HTML calls
 window.generateTags = generateTags;
@@ -159,7 +158,7 @@ window.generateTags = generateTags;
   const loadingMsg = document.getElementById('loadingMsg');
   const errorMsg = document.getElementById('errorMsg');
   const generateBtn = document.getElementById('generateBtn');
-  const apiKey = 'AIzaSyApalxj159CWeJ0u8zGKFM7H0hb9QybSCM';
+  const apiKey = 'AIzaSyDpvLGQahlMs6RxDJ9aE8BRhgPAERVnESU';
 
   errorMsg.style.display = 'none';
   selectedTags.clear();
@@ -178,68 +177,61 @@ window.generateTags = generateTags;
   generateBtn.disabled = true;
 
   try {
-    const parts = [];
-    let prompt = `Analyze the provided content and suggest relevant tags. Consider themes, purpose, and context. Return 5-10 specific, relevant tags as a comma-separated list. Focus on: social justice themes, media format, intended use, and circulation context.`;
-
-    if (selectedAudioFile && selectedAudioFile.type.startsWith('audio/')) {
-      const base64Data = await fileToBase64(selectedAudioFile);
-      // Gemini expects base64 without the data URL prefix
-      const cleanBase64 = base64Data.split(',').pop();
-      parts.push({
-        inlineData: {
-          mimeType: selectedAudioFile.type,
-          data: cleanBase64
-        }
-      });
-      parts.push({ text: `Analyze this audio file and ${prompt}` });
-    } else {
-      if (selectedVisualFile) {
-        const base64Data = await fileToBase64(selectedVisualFile);
-        const cleanBase64 = base64Data.split(',').pop();
-        parts.push({
-          inlineData: {
-            mimeType: selectedVisualFile.type,
-            data: cleanBase64
-          }
-        });
-      }
-      if (textInput && selectedVisualFile) {
-        parts.push({ text: `${prompt}\n\nAnalyze both the provided visual (image/pdf) and this text content together: ${textInput}` });
-      } else if (textInput) {
-        parts.push({ text: `${prompt}\n\nContent: ${textInput}` });
-      } else if (selectedVisualFile) {
-        parts.push({ text: `Analyze the provided visual content (image/pdf) and ${prompt}` });
-      }
+    // For now, use text-only description approach
+    let contentDescription = '';
+    
+    if (selectedAudioFile) {
+      contentDescription = `This is an audio file named "${selectedAudioFile.name}". `;
+    }
+    if (selectedVisualFile) {
+      contentDescription += `This is a ${selectedVisualFile.type.includes('pdf') ? 'PDF document' : 'image file'} named "${selectedVisualFile.name}". `;
+    }
+    if (textInput) {
+      contentDescription += textInput;
     }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}` , {
+    const prompt = `Analyze this content and suggest 5-10 relevant tags as a comma-separated list. Focus on: social justice themes, media format, intended use, and circulation context.\n\nContent: ${contentDescription}`;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         contents: [{
-          parts: parts
+          parts: [{
+            text: prompt
+          }]
         }]
       })
     });
 
     if (!response.ok) {
       const errorResponse = await response.json();
-      throw new Error(`API request failed: ${response.statusText} - ${JSON.stringify(errorResponse)}`);
+      console.error('API Error Details:', errorResponse);
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('API Response:', data);
+    
     const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const tags = generatedText
       .split(/,|\n/)
       .map(tag => tag.trim())
       .filter(tag => tag.length > 0 && tag.length < 50);
 
+    if (tags.length === 0) {
+      throw new Error('No tags generated. Please try again or add tags manually.');
+    }
+
     displayTags(tags);
   } catch (error) {
-    errorMsg.textContent = `Error: ${error.message}`;
+    console.error('Full error:', error);
+    errorMsg.textContent = `Error: ${error.message}. You can still add tags manually below.`;
     errorMsg.style.display = 'block';
+    // Still show the tag selection interface so users can add manually
+    displayTags([]);
   } finally {
     loadingMsg.style.display = 'none';
     generateBtn.disabled = false;
