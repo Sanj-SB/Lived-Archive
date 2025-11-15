@@ -11,13 +11,35 @@ if (typeof window !== 'undefined' && !window.supabase) {
 // Admin credentials
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'password123';
+const ADMIN_ACCESS_PASSWORD = 'admin2024'; // Password for accessing admin page
 
 // State
 let isLoggedIn = false;
+let isAdminAccessGranted = false;
 
 // Initialize admin functionality
 export function initializeAdmin() {
-  // Always show review queue and logout button
+  // Check if we're on admin.html and show password modal
+  if (window.location.pathname.includes('admin.html')) {
+    const passwordModal = document.getElementById('passwordModal');
+    if (passwordModal && !isAdminAccessGranted) {
+      passwordModal.style.display = 'flex';
+      // Add Enter key support for password input
+      const passwordInput = document.getElementById('adminPassword');
+      if (passwordInput) {
+        passwordInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            verifyAdminPassword();
+          }
+        });
+        // Focus on password input
+        setTimeout(() => passwordInput.focus(), 100);
+      }
+      return; // Don't show review page yet
+    }
+  }
+  
+  // Always show review queue and logout button (after password verified)
   const reviewPage = document.getElementById('reviewPage');
   if (reviewPage) reviewPage.style.display = 'block';
   const logoutBtn = document.getElementById('logoutBtn');
@@ -418,3 +440,34 @@ function handleLogout() {
   window.location.href = 'index.html';
 }
 window.handleLogout = handleLogout;
+
+// Verify admin password
+function verifyAdminPassword() {
+  const passwordInput = document.getElementById('adminPassword');
+  const passwordError = document.getElementById('passwordError');
+  const passwordModal = document.getElementById('passwordModal');
+  
+  if (passwordInput.value === ADMIN_ACCESS_PASSWORD) {
+    // Password correct - grant access
+    isAdminAccessGranted = true;
+    passwordModal.style.display = 'none';
+    passwordError.style.display = 'none';
+    
+    // Now initialize the admin page
+    const reviewPage = document.getElementById('reviewPage');
+    if (reviewPage) reviewPage.style.display = 'block';
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    
+    // Load review queue
+    if (typeof window.loadReviewQueue === 'function' && window.pendingArtifacts) {
+      window.loadReviewQueue(window.pendingArtifacts);
+    }
+  } else {
+    // Password incorrect - show error
+    passwordError.style.display = 'block';
+    passwordInput.value = '';
+    passwordInput.focus();
+  }
+}
+window.verifyAdminPassword = verifyAdminPassword;

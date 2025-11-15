@@ -159,7 +159,7 @@ window.generateTags = generateTags;
   const loadingMsg = document.getElementById('loadingMsg');
   const errorMsg = document.getElementById('errorMsg');
   const generateBtn = document.getElementById('generateBtn');
-  const apiKey = 'AIzaSyDBFw_WgGbngy_Pw5lC2xhOpy7A2veCSqk';
+  const apiKey = 'AIzaSyApalxj159CWeJ0u8zGKFM7H0hb9QybSCM';
 
   errorMsg.style.display = 'none';
   selectedTags.clear();

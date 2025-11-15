@@ -714,7 +714,8 @@ function setupFilters(nodes) {
     categoriesHeader.style.alignItems = 'center';
     categoriesHeader.style.justifyContent = 'space-between';
     categoriesHeader.style.cursor = 'pointer';
-    categoriesHeader.style.fontWeight = 'bold';
+    categoriesHeader.style.fontWeight = 'normal';
+    categoriesHeader.style.fontFamily = 'Roboto, sans-serif';
     categoriesHeader.style.margin = '12px 0 6px 0';
     categoriesHeader.style.padding = '6px 4px';
     const label = document.createElement('span');

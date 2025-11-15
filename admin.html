@@ -24,10 +24,29 @@
     </div>
   </div>
 
+  <!-- Password Modal (shown on page load) -->
+  <div id="passwordModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>Admin Access</h2>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; gap: 20px;">
+          <div>
+            <label style="display: block; margin-bottom: 8px; font-weight: bold;">Enter Password</label>
+            <input type="password" id="adminPassword" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; font-family: 'Georgia', serif;" placeholder="Password">
+          </div>
+          <div id="passwordError" style="display: none; color: #c62828; text-align: center;">Incorrect password. Please try again.</div>
+          <button class="btn" onclick="verifyAdminPassword()" style="width: 100%;">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Login Page removed. Review queue shown by default. -->
 
   <!-- Review Page -->
-  <div id="reviewPage" class="page">
+  <div id="reviewPage" class="page" style="display: none;">
     <!-- Admin Summary Section -->
     <section class="admin-summary" aria-labelledby="adminSummaryHeading">
       <h2 id="adminSummaryHeading">Dashboard Overview</h2>
