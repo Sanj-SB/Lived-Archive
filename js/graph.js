@@ -60,52 +60,107 @@ function showPersonaModal() {
 
   const modal = document.createElement('div');
   modal.style.background = '#fff';
-  modal.style.borderRadius = '10px';
-  modal.style.padding = '20px';
-  modal.style.width = 'min(560px, 92vw)';
+  modal.style.borderRadius = '20px';
+  modal.style.padding = '40px';
+  modal.style.width = 'min(600px, 92vw)';
   modal.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+  modal.style.textAlign = 'center';
 
+  // Title
   const title = document.createElement('h2');
-  title.textContent = 'Choose a persona';
-  title.style.margin = '0 0 12px 0';
+  title.textContent = 'Ready for the archive?';
+  title.style.margin = '0 0 30px 0';
+  title.style.fontSize = '32px';
+  title.style.fontWeight = '500';
+  title.style.color = '#333';
 
-  const subtitle = document.createElement('p');
-  subtitle.textContent = 'This helps tailor the graph to what you care about.';
-  subtitle.style.margin = '0 0 16px 0';
-  subtitle.style.color = '#555';
+  // Start button (large, centered)
+  const startBtn = document.createElement('button');
+  startBtn.type = 'button';
+  startBtn.textContent = 'Start!';
+  startBtn.style.padding = '16px 60px';
+  startBtn.style.borderRadius = '50px';
+  startBtn.style.border = 'none';
+  startBtn.style.background = '#514575';
+  startBtn.style.color = '#fff';
+  startBtn.style.fontSize = '20px';
+  startBtn.style.fontWeight = '500';
+  startBtn.style.cursor = 'pointer';
+  startBtn.style.marginBottom = '40px';
+  startBtn.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+  startBtn.onmouseenter = () => {
+    startBtn.style.transform = 'scale(1.05)';
+    startBtn.style.boxShadow = '0 6px 20px rgba(81, 69, 117, 0.4)';
+  };
+  startBtn.onmouseleave = () => {
+    startBtn.style.transform = 'scale(1)';
+    startBtn.style.boxShadow = 'none';
+  };
+  startBtn.onclick = () => {
+    // Set to Curious Explorer (no filter) and proceed
+    window.selectedPersona = 'Curious Explorer';
+    localStorage.setItem('selectedPersona', 'Curious Explorer');
+    window.personaTags = [];
+    if (window.updateGraphFilters) window.updateGraphFilters();
+    document.body.removeChild(overlay);
+  };
 
-  const options = ['Curious Explorer','Advocate', 'Artist', 'Researcher', 'Educator'];
+  // Divider line
+  const divider = document.createElement('hr');
+  divider.style.border = 'none';
+  divider.style.borderTop = '1px solid #ddd';
+  divider.style.margin = '30px 0';
+
+  // Secondary section
+  const subtitle = document.createElement('h3');
+  subtitle.textContent = 'Not sure where to start?';
+  subtitle.style.margin = '0 0 10px 0';
+  subtitle.style.fontSize = '20px';
+  subtitle.style.fontWeight = '500';
+  subtitle.style.color = '#333';
+
+  const description = document.createElement('p');
+  description.textContent = 'Choose a space that suits you best and we\'ll curate the graph for you!';
+  description.style.margin = '0 0 25px 0';
+  description.style.color = '#666';
+  description.style.fontSize = '16px';
+  description.style.lineHeight = '1.5';
+
+  // Persona buttons grid
+  const options = ['Advocate', 'Artist', 'Researcher', 'Educator', 'Curious Explorer'];
   const grid = document.createElement('div');
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(160px, 1fr))';
-  grid.style.gap = '10px';
+  grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  grid.style.gap = '12px';
+  grid.style.maxWidth = '500px';
+  grid.style.margin = '0 auto';
 
   options.forEach(p => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = p;
-    btn.style.padding = '10px 12px';
-    btn.style.borderRadius = '20px';
-    btn.style.border = '1px solid #514575';
+    btn.style.padding = '12px 20px';
+    btn.style.borderRadius = '25px';
+    btn.style.border = '2px solid #514575';
     btn.style.background = '#fff';
-    btn.style.color = '#514575'; // base text color
+    btn.style.color = '#514575';
     btn.style.cursor = 'pointer';
+    btn.style.fontSize = '15px';
+    btn.style.fontWeight = '500';
+    btn.style.transition = 'all 0.2s ease';
     btn.onmouseenter = () => {
       btn.style.background = '#514575';
-      btn.style.color = '#fff';          // hover text color
+      btn.style.color = '#fff';
     };
     btn.onmouseleave = () => {
       btn.style.background = '#fff';
-      btn.style.color = '#514575';       // restore base text color
+      btn.style.color = '#514575';
     };
     btn.onclick = () => {
       window.selectedPersona = p;
       localStorage.setItem('selectedPersona', p);
       window.personaTags = window.personaTagsMap[p] || [];
-      // If radios exist, sync them
-      const radio = document.querySelector(`input[name="personaChoice"][value="${p}"]`);
-      if (radio) radio.checked = true;
-      // If sidebar persona buttons exist, sync their visual state
+      // Sync sidebar buttons if they exist
       document.querySelectorAll('button[data-persona]').forEach(b => {
         const isSelected = b.dataset.persona === p;
         b.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
@@ -113,14 +168,16 @@ function showPersonaModal() {
         b.style.color = isSelected ? '#fff' : '#514575';
       });
       if (window.updateGraphFilters) window.updateGraphFilters();
-      if (window.updatePersonaBadge) window.updatePersonaBadge();
       document.body.removeChild(overlay);
     };
     grid.appendChild(btn);
   });
 
   modal.appendChild(title);
+  modal.appendChild(startBtn);
+  modal.appendChild(divider);
   modal.appendChild(subtitle);
+  modal.appendChild(description);
   modal.appendChild(grid);
   overlay.appendChild(modal);
   document.body.appendChild(overlay);

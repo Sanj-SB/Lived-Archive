@@ -11,6 +11,10 @@ let selectedVisualFile = null;
 let selectedTags = new Set();
 let currentArtifactData = null;
 
+// Rate limiting variables
+let lastAPICall = 0;
+const MIN_API_DELAY = 3000; // 3 seconds between calls
+
 // Initialize submission page
 export function initializeSubmitPage() {
   // Set up file input listeners
@@ -173,6 +177,16 @@ window.generateTags = generateTags;
     return;
   }
 
+  // Check rate limit
+  const now = Date.now();
+  const timeSinceLastCall = now - lastAPICall;
+  if (timeSinceLastCall < MIN_API_DELAY) {
+    const waitTime = Math.ceil((MIN_API_DELAY - timeSinceLastCall) / 1000);
+    errorMsg.textContent = `Please wait ${waitTime} seconds before trying again.`;
+    errorMsg.style.display = 'block';
+    return;
+  }
+
   loadingMsg.style.display = 'block';
   generateBtn.disabled = true;
 
@@ -192,10 +206,14 @@ window.generateTags = generateTags;
 
     const prompt = `Analyze this content and suggest 5-10 relevant tags as a comma-separated list. Focus on: social justice themes, media format, intended use, and circulation context.\n\nContent: ${contentDescription}`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+    lastAPICall = now; // Update last call time
+
+    // Use the correct Google AI API format from their documentation
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
       },
       body: JSON.stringify({
         contents: [{
@@ -209,6 +227,12 @@ window.generateTags = generateTags;
     if (!response.ok) {
       const errorResponse = await response.json();
       console.error('API Error Details:', errorResponse);
+      
+      // Handle rate limit specifically
+      if (response.status === 429) {
+        throw new Error('API rate limit reached. Please wait a few seconds and try again, or add tags manually.');
+      }
+      
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
 
@@ -228,7 +252,7 @@ window.generateTags = generateTags;
     displayTags(tags);
   } catch (error) {
     console.error('Full error:', error);
-    errorMsg.textContent = `Error: ${error.message}. You can still add tags manually below.`;
+    errorMsg.textContent = `${error.message} You can still add tags manually below.`;
     errorMsg.style.display = 'block';
     // Still show the tag selection interface so users can add manually
     displayTags([]);

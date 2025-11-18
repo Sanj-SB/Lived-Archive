@@ -159,6 +159,15 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof window.loadArchive === 'function') {
     window.loadArchive();
   }
+  // Mobile nav toggle logic
+  var navToggle = document.getElementById('navToggle');
+  var navMenu = document.getElementById('navMenu');
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', function() {
+      var isActive = navMenu.classList.toggle('active');
+      navMenu.setAttribute('aria-hidden', String(!isActive));
+    });
+  }
 });
 </script>
 
