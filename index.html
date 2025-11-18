@@ -20,6 +20,7 @@
       <button class="btn btn-submit" id="submitArtifactBtn" type="button">Submit Artifact</button>
     </nav>
     <nav class="nav-right">
+      <button class="btn btn-help" id="helpBtn" type="button" aria-label="Help">?</button>
       <a class="btn link-login" href="admin.html">Login</a>
     </nav>
     <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
@@ -131,6 +132,50 @@
     </div>
   </div>
 
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>Help & Guide</h2>
+        <button class="close-modal" onclick="closeHelpModal()">×</button>
+      </div>
+      <div class="modal-body" style="text-align: left;">
+        <div style="margin-bottom: 30px;">
+          <h3 style="font-size: 20px; margin-bottom: 10px; color: #514575;">What is Lived-Archive?</h3>
+          <p style="line-height: 1.6; color: #333;">Lived-Archive is a digital collection of artifacts dedicated to the Dalit media spaces, where users can be a part of it by sending in artifacts, being a part of the admin cycle, or simply interacting with the archive!</p>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h3 style="font-size: 20px; margin-bottom: 10px; color: #514575;">Finding Content</h3>
+          <ul style="line-height: 1.8; color: #333; padding-left: 20px;">
+            <li>Start at the homepage to see featured topics and new additions.</li>
+            <li>Use the search bar to find artifacts or keywords.</li>
+            <li>Explore the map by switching themes in the menu, follow the dot connections or simply click away through.</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h3 style="font-size: 20px; margin-bottom: 10px; color: #514575;">Navigating the Archive</h3>
+          <ul style="line-height: 1.8; color: #333; padding-left: 20px;">
+            <li>Use network or timeline visualizations to see how items connect.</li>
+            <li>Menus at the top or side provide shortcuts to Collections, People Experiences, or Tags.</li>
+            <li>Each artifact includes a title, description, tags, and may have images or media attached.</li>
+            <li>Related artifacts are shown as clickable links—try them to follow a thematic path.</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 0;">
+          <h3 style="font-size: 20px; margin-bottom: 10px; color: #514575;">Adding and Tagging</h3>
+          <ul style="line-height: 1.8; color: #333; padding-left: 20px;">
+            <li>If you've got work that connects to the Dalit space go ahead and click "Submit Artifact".</li>
+            <li>Then follow 3 simple steps: Upload, Tag and Describe!</li>
+            <li>Upload a PDF, Image, Text, Audio or URL</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 
 <!-- Single entry module: app.js imports the other modules it needs -->
@@ -173,7 +218,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Fallback: ensure submit flow always works -->
 <script>
+// Global help modal close function
+function closeHelpModal() {
+  var helpModal = document.getElementById('helpModal');
+  if (helpModal) helpModal.classList.remove('active');
+}
+window.closeHelpModal = closeHelpModal;
+
 document.addEventListener('DOMContentLoaded', function() {
+  // Help button handler
+  var helpBtn = document.getElementById('helpBtn');
+  var helpModal = document.getElementById('helpModal');
+  if (helpBtn && helpModal) {
+    helpBtn.onclick = function() {
+      helpModal.classList.add('active');
+    };
+    // Close on outside click
+    helpModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeHelpModal();
+      }
+    });
+  }
+
   var submitBtn = document.getElementById('submitArtifactBtn');
   var userInfoModal = document.getElementById('userInfoModal');
   var continueBtn = userInfoModal && userInfoModal.querySelector('button[onclick*="submitUserInfo"]');

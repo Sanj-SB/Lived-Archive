@@ -43,6 +43,322 @@ window.personaTagsMap = {
   'Curious Explorer': [] // No filter
 };
 
+// Carousel modal system with intro slides
+function showIntroCarousel() {
+  // Prevent duplicate modals
+  if (document.getElementById('introCarouselOverlay')) return;
+
+  let currentSlide = 0;
+  const slides = [
+    {
+      // Slide 1: Welcome
+      headerBg: '#9b87c4',
+      headerText: 'Welcome to the Lived Archive!',
+      bodyText: 'Lived-Archive is a digital collection of artifacts dedicated to the Dalit media spaces, where users can be a part of it by sending in artifacts, being a part of the admin cycle, or simply interacting with the archive!',
+      footerText: 'Coming up: Quick Start Guide'
+    },
+    {
+      // Slide 2: Finding Content (NEW)
+      title: 'Quick Start Guide',
+      subtitle: 'Finding Content',
+      bullets: [
+        'Start at the homepage to see featured topics and new additions.',
+        'Use the search bar to find artifacts or keywords.',
+        'Explore the map by switching themes in the menu, follow the dot connections or simply click away through.'
+      ]
+    },
+    {
+      // Slide 3: Navigating
+      title: 'Quick Start Guide',
+      subtitle: 'Navigating the Archive',
+      bullets: [
+        'Use network or timeline visualizations to see how items connect.',
+        'Menus at the top or side provide shortcuts to Collections, People Experiences, or Tags.',
+        'Each artifact includes a title, description, tags, and may have images or media attached.',
+        'Related artifacts are shown as clickable links—try them to follow a thematic path.'
+      ]
+    },
+    {
+      // Slide 4: Adding and Tagging
+      title: 'Quick Start Guide',
+      subtitle: 'Adding and Tagging',
+      content: [
+        'If you\'ve got work that connects to the Dalit space go ahead and click "Submit Artifact".',
+        'Then follow 3 simple steps: Upload, Tag and Describe!',
+        'Upload a PDF, Image, Text, Audio or URL'
+      ]
+    }
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'introCarouselOverlay';
+  overlay.style.position = 'fixed';
+  overlay.style.inset = '0';
+  overlay.style.background = 'rgba(0,0,0,0.5)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = '1000';
+
+  const modal = document.createElement('div');
+  modal.style.background = '#fff';
+  modal.style.borderRadius = '20px';
+  modal.style.width = 'min(700px, 92vw)';
+  modal.style.height = 'min(600px, 85vh)'; // Fixed height
+  modal.style.maxHeight = '600px';
+  modal.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
+  modal.style.overflow = 'hidden';
+  modal.style.position = 'relative';
+  modal.style.display = 'flex';
+  modal.style.flexDirection = 'column';
+
+  const slideContainer = document.createElement('div');
+  slideContainer.style.flex = '1';
+  slideContainer.style.display = 'flex';
+  slideContainer.style.flexDirection = 'column';
+  slideContainer.style.position = 'relative';
+  slideContainer.style.overflow = 'auto';
+
+  function renderSlide(index) {
+    slideContainer.innerHTML = '';
+    const slide = slides[index];
+
+    // Skip button (top right corner, only show on non-last slides)
+    if (index < slides.length - 1) {
+      const skipBtn = document.createElement('button');
+      skipBtn.textContent = 'Skip';
+      skipBtn.style.position = 'absolute';
+      skipBtn.style.top = '20px';
+      skipBtn.style.right = '20px';
+      skipBtn.style.padding = '8px 16px';
+      skipBtn.style.borderRadius = '20px';
+      skipBtn.style.border = '1px solid #999';
+      skipBtn.style.background = 'transparent';
+      skipBtn.style.color = '#666';
+      skipBtn.style.cursor = 'pointer';
+      skipBtn.style.fontSize = '14px';
+      skipBtn.style.fontWeight = '400';
+      skipBtn.style.transition = 'all 0.2s ease';
+      skipBtn.style.zIndex = '10';
+      skipBtn.onmouseenter = () => {
+        skipBtn.style.background = '#f5f5f5';
+        skipBtn.style.color = '#333';
+      };
+      skipBtn.onmouseleave = () => {
+        skipBtn.style.background = 'transparent';
+        skipBtn.style.color = '#666';
+      };
+      skipBtn.onclick = () => {
+        document.body.removeChild(overlay);
+        showPersonaModal();
+      };
+      slideContainer.appendChild(skipBtn);
+    }
+
+    // Content wrapper with flex grow to push navigation to bottom
+    const contentWrapper = document.createElement('div');
+    contentWrapper.style.flex = '1';
+    contentWrapper.style.display = 'flex';
+    contentWrapper.style.flexDirection = 'column';
+
+    if (index === 0) {
+      // Slide 1: Welcome with purple header
+      const header = document.createElement('div');
+      header.style.background = slide.headerBg;
+      header.style.padding = '40px 40px';
+      header.style.textAlign = 'center';
+      const headerTitle = document.createElement('h1');
+      headerTitle.textContent = slide.headerText;
+      headerTitle.style.color = '#fff';
+      headerTitle.style.margin = '0';
+      headerTitle.style.fontSize = '36px';
+      headerTitle.style.fontWeight = '700';
+      header.appendChild(headerTitle);
+
+      const body = document.createElement('div');
+      body.style.padding = '40px';
+      body.style.textAlign = 'center';
+      body.style.flex = '1';
+      body.style.display = 'flex';
+      body.style.flexDirection = 'column';
+      body.style.justifyContent = 'center';
+      
+      const bodyText = document.createElement('p');
+      bodyText.textContent = slide.bodyText;
+      bodyText.style.fontSize = '18px';
+      bodyText.style.lineHeight = '1.8';
+      bodyText.style.color = '#333';
+      bodyText.style.margin = '0 0 40px 0';
+      body.appendChild(bodyText);
+
+      const divider = document.createElement('hr');
+      divider.style.border = 'none';
+      divider.style.borderTop = '2px solid #333';
+      divider.style.margin = '0 0 20px 0';
+      body.appendChild(divider);
+
+      const footer = document.createElement('div');
+      footer.textContent = slide.footerText;
+      footer.style.fontSize = '20px';
+      footer.style.fontWeight = '500';
+      footer.style.color = '#333';
+      footer.style.textDecoration = 'underline';
+      body.appendChild(footer);
+
+      contentWrapper.appendChild(header);
+      contentWrapper.appendChild(body);
+    } else {
+      // Slides 2, 3 & 4: Quick Start Guide format
+      const content = document.createElement('div');
+      content.style.padding = '60px 40px 40px';
+      content.style.flex = '1';
+      content.style.display = 'flex';
+      content.style.flexDirection = 'column';
+
+      const title = document.createElement('h2');
+      title.textContent = slide.title;
+      title.style.textAlign = 'center';
+      title.style.fontSize = '32px';
+      title.style.fontWeight = '500';
+      title.style.margin = '0 0 30px 0';
+      title.style.color = '#333';
+      title.style.textDecoration = 'underline';
+      content.appendChild(title);
+
+      const subtitle = document.createElement('h3');
+      subtitle.textContent = slide.subtitle;
+      subtitle.style.fontSize = '24px';
+      subtitle.style.fontWeight = '600';
+      subtitle.style.margin = '0 0 20px 0';
+      subtitle.style.color = '#333';
+      content.appendChild(subtitle);
+
+      if (slide.bullets) {
+        const list = document.createElement('ul');
+        list.style.fontSize = '16px';
+        list.style.lineHeight = '1.8';
+        list.style.color = '#333';
+        list.style.paddingLeft = '20px';
+        list.style.margin = '0';
+        slide.bullets.forEach(bullet => {
+          const li = document.createElement('li');
+          li.textContent = bullet;
+          li.style.marginBottom = '12px';
+          list.appendChild(li);
+        });
+        content.appendChild(list);
+      }
+
+      if (slide.content) {
+        slide.content.forEach(text => {
+          const p = document.createElement('p');
+          p.textContent = text;
+          p.style.fontSize = '16px';
+          p.style.lineHeight = '1.8';
+          p.style.color = '#333';
+          p.style.margin = '0 0 15px 0';
+          content.appendChild(p);
+        });
+      }
+
+      contentWrapper.appendChild(content);
+    }
+
+    slideContainer.appendChild(contentWrapper);
+
+    // Progress dots
+    const dotsContainer = document.createElement('div');
+    dotsContainer.style.display = 'flex';
+    dotsContainer.style.justifyContent = 'center';
+    dotsContainer.style.gap = '10px';
+    dotsContainer.style.padding = '20px';
+    slides.forEach((_, i) => {
+      const dot = document.createElement('span');
+      dot.style.width = '12px';
+      dot.style.height = '12px';
+      dot.style.borderRadius = '50%';
+      dot.style.background = i === index ? '#514575' : '#ddd';
+      dot.style.transition = 'background 0.3s ease';
+      dotsContainer.appendChild(dot);
+    });
+    slideContainer.appendChild(dotsContainer);
+
+    // Navigation buttons at bottom left and right
+    const navContainer = document.createElement('div');
+    navContainer.style.display = 'flex';
+    navContainer.style.justifyContent = 'space-between';
+    navContainer.style.padding = '0 40px 30px';
+
+    // Previous button (bottom left)
+    if (index > 0) {
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '← Previous';
+      prevBtn.style.padding = '12px 24px';
+      prevBtn.style.borderRadius = '25px';
+      prevBtn.style.border = '2px solid #514575';
+      prevBtn.style.background = '#fff';
+      prevBtn.style.color = '#514575';
+      prevBtn.style.cursor = 'pointer';
+      prevBtn.style.fontSize = '16px';
+      prevBtn.style.fontWeight = '500';
+      prevBtn.style.transition = 'all 0.2s ease';
+      prevBtn.onmouseenter = () => {
+        prevBtn.style.background = '#514575';
+        prevBtn.style.color = '#fff';
+      };
+      prevBtn.onmouseleave = () => {
+        prevBtn.style.background = '#fff';
+        prevBtn.style.color = '#514575';
+      };
+      prevBtn.onclick = () => {
+        currentSlide--;
+        renderSlide(currentSlide);
+      };
+      navContainer.appendChild(prevBtn);
+    } else {
+      navContainer.appendChild(document.createElement('div'));
+    }
+
+    // Next button (bottom right)
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = index === slides.length - 1 ? 'Get Started →' : 'Next →';
+    nextBtn.style.padding = '12px 24px';
+    nextBtn.style.borderRadius = '25px';
+    nextBtn.style.border = 'none';
+    nextBtn.style.background = '#514575';
+    nextBtn.style.color = '#fff';
+    nextBtn.style.cursor = 'pointer';
+    nextBtn.style.fontSize = '16px';
+    nextBtn.style.fontWeight = '500';
+    nextBtn.style.transition = 'all 0.2s ease';
+    nextBtn.onmouseenter = () => {
+      nextBtn.style.transform = 'scale(1.05)';
+      nextBtn.style.boxShadow = '0 6px 20px rgba(81, 69, 117, 0.4)';
+    };
+    nextBtn.onmouseleave = () => {
+      nextBtn.style.transform = 'scale(1)';
+      nextBtn.style.boxShadow = 'none';
+    };
+    nextBtn.onclick = () => {
+      if (index === slides.length - 1) {
+        document.body.removeChild(overlay);
+        showPersonaModal();
+      } else {
+        currentSlide++;
+        renderSlide(currentSlide);
+      }
+    };
+    navContainer.appendChild(nextBtn);
+
+    slideContainer.appendChild(navContainer);
+  }
+
+  renderSlide(0);
+  modal.appendChild(slideContainer);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
 // Lightweight persona selection modal
 function showPersonaModal() {
   // Prevent duplicate modals
@@ -100,6 +416,7 @@ function showPersonaModal() {
     // Set to Curious Explorer (no filter) and proceed
     window.selectedPersona = 'Curious Explorer';
     localStorage.setItem('selectedPersona', 'Curious Explorer');
+    localStorage.setItem('hasSeenIntro', 'true'); // Mark intro as seen
     window.personaTags = [];
     if (window.updateGraphFilters) window.updateGraphFilters();
     document.body.removeChild(overlay);
@@ -159,6 +476,7 @@ function showPersonaModal() {
     btn.onclick = () => {
       window.selectedPersona = p;
       localStorage.setItem('selectedPersona', p);
+      localStorage.setItem('hasSeenIntro', 'true'); // Mark intro as seen
       window.personaTags = window.personaTagsMap[p] || [];
       // Sync sidebar buttons if they exist
       document.querySelectorAll('button[data-persona]').forEach(b => {
@@ -686,6 +1004,7 @@ function setupFilters(nodes) {
         stylePersonaButton(b, selected);
       });
       if (window.updateGraphFilters) window.updateGraphFilters();
+      document.body.removeChild(overlay);
     };
     personaGrid.appendChild(btn);
   });
@@ -950,12 +1269,20 @@ export function loadArchive() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+  const hasSeenIntro = localStorage.getItem('hasSeenIntro');
   const savedPersona = localStorage.getItem('selectedPersona');
-  if (!savedPersona) {
+  
+  if (!hasSeenIntro && !savedPersona) {
+    // First time visitor - show full carousel
+    showIntroCarousel();
+  } else if (!savedPersona) {
+    // Has seen intro but no persona selected - skip to persona modal
     showPersonaModal();
   } else {
+    // Returning visitor with saved persona
     window.selectedPersona = savedPersona;
     window.personaTags = window.personaTagsMap[savedPersona] || [];
   }
+  
   loadArchive();
 });
