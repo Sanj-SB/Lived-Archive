@@ -1,173 +1,179 @@
-# Lived Archive - Project Structure
-
-## 📁 File Organization
-
-Your project should have this structure in VS Code:
-
-```
-lived-archive/
+``
+/Users/roopa/Desktop/College/Prethesis/Codes/
 │
-├── index.html              # Home/Archive page (network graph)
-├── submit.html             # Artifact submission/tagger page
-├── admin.html              # Admin login & review page
+├── index.html                          # Main home page with network graph
+│   ├── Navigation bar (Home, Submit, Help ?, Login)
+│   ├── Network graph visualization
+│   ├── Filter panels (left: tag/search, right: personas/categories)
+│   ├── Timeline/Network toggle button
+│   ├── Zoom controls
+│   └── Modals:
+│       ├── Artifact details modal
+│       ├── User info modal (for submission)
+│       ├── Login modal
+│       └── Help modal (new)
 │
-├── styles.css              # Shared styles (used by all pages)
-├── submit-styles.css       # Submit page specific styles
-├── admin-styles.css        # Admin page specific styles
+├── submit.html                         # Artifact submission page
+│   ├── File upload (image/PDF/audio)
+│   ├── Text input option
+│   ├── AI tag generation (Google Gemini API)
+│   ├── Tag selection interface (4 categories)
+│   ├── Custom tag inputs
+│   └── Artifact details form
 │
-├── script.js               # Shared functions (localStorage, modals)
-├── graph.js                # Network graph visualization (D3.js)
-├── submit.js               # Submit page logic (file upload, tagging)
-└── admin.js                # Admin page logic (login, review queue)
-```
-
-## 🔗 How Files Connect
-
-### **index.html** (Home Page)
-- Links: `styles.css`
-- Scripts: `script.js`, `graph.js`
-- Features: Network graph, artifact viewing, sample data loading
-
-### **submit.html** (Tagger Page)
-- Links: `styles.css`, `submit-styles.css`
-- Scripts: `script.js`, `submit.js`
-- Features: File upload, AI tagging, artifact details form
-
-### **admin.html** (Admin Page)
-- Links: `styles.css`, `admin-styles.css`
-- Scripts: `script.js`, `admin.js`
-- Features: Login system, review queue, artifact approval
-
-## 🔐 Admin Credentials
-
-**Username:** `admin`  
-**Password:** `password123`
-
-*(Change these in `admin.js` if needed)*
-
-## 💾 Data Storage
-
-All data is stored in browser **localStorage**:
-- `acceptedArtifacts` - Published artifacts (shown on home page)
-- `pendingArtifacts` - Submitted artifacts awaiting review
-
-**Note:** Data persists across sessions but is browser-specific.
-
-## 🚀 Getting Started
-
-1. Create all 9 files in your VS Code project folder
-2. Copy the code for each file from the artifacts
-3. Open `index.html` in your browser to test
-4. Push to GitHub and enable GitHub Pages for live hosting
-
-## 🔄 Page Navigation Flow
-
-```
-index.html (Home)
-    ↓
-    ├─→ submit.html (Submit Artifact)
-    │       ↓
-    │   (submits to pending queue)
+├── admin.html                          # Admin review panel
+│   ├── Pending artifacts queue
+│   ├── Accept/Reject functionality
+│   └── Artifact preview
+│
+├── css/
+│   ├── style.css                       # Main styles
+│   │   ├── Header/navbar styles
+│   │   ├── Button styles (including help button)
+│   │   ├── Modal styles
+│   │   ├── Form styles
+│   │   └── Responsive design
+│   │
+│   ├── graph-styles.css                # Graph-specific styles
+│   │   ├── Node & link styles
+│   │   ├── Tooltip styles
+│   │   ├── Filter panel styles
+│   │   ├── Timeline toggle styles
+│   │   └── Zoom control styles
+│   │
+│   └── submit-styles.css               # Submit page styles
+│       ├── File upload interface
+│       ├── Tag selection styles
+│       └── Form layout
+│
+├── js/
+│   ├── main.js                         # Entry point module
+│   │
+│   ├── app.js                          # Application orchestrator
+│   │   ├── State management
+│   │   ├── Modal handlers
+│   │   ├── Supabase data fetching
+│   │   └── Global function exports
+│   │
+│   ├── graph.js                        # Network graph & intro system
+│   │   ├── **Intro carousel (4 slides)**
+│   │   │   ├── Welcome slide
+│   │   │   ├── Finding Content guide
+│   │   │   ├── Navigating guide
+│   │   │   └── Adding & Tagging guide
+│   │   ├── **Persona selection modal**
+│   │   │   ├── Start button (no filter)
+│   │   │   └── 5 persona options
+│   │   ├── D3.js force-directed graph
+│   │   ├── Timeline view layout
+│   │   ├── Node/link generation
+│   │   ├── Category color mapping
+│   │   ├── Tooltip system
+│   │   ├── Filter system (personas/categories)
+│   │   └── Zoom controls
+│   │
+│   ├── submit.js                       # Submission workflow
+│   │   ├── File handling (visual/audio)
+│   │   ├── **AI tag generation (Gemini API)**
+│   │   │   ├── Rate limiting (3 sec)
+│   │   │   ├── Error handling
+│   │   │   └── Manual fallback
+│   │   ├── Tag display & selection
+│   │   ├── Custom tag inputs
+│   │   ├── Form validation
+│   │   └── Supabase upload
+│   │
+│   ├── admin.js                        # Admin panel logic
+│   │   ├── Review queue management
+│   │   ├── Accept/reject handlers
+│   │   └── Artifact preview
+│   │
+│   ├── supabaseClient.js              # Database client
+│   │   ├── Supabase initialization
+│   │   ├── Storage helpers
+│   │   └── Public URL generation
+│   │
+│   ├── config.js                       # Configuration
+│   │   ├── Tag categories (4 types)
+│   │   ├── Persona tag mappings
+│   │   └── Application settings
+│   │
+│   ├── navigation.js                   # Page navigation
+│   │   └── SPA routing helpers
+│   │
+│   └── utils.js                        # Utility functions
+│       └── Helper methods
+│
+├── assets/
+│   ├── checkbox-filled.svg            # Category filter checkboxes
+│   └── checkbox-unfilled.svg
+│
+└── Database (Supabase):
+    ├── Tables:
+    │   ├── accepted_artifacts          # Published artifacts
+    │   │   ├── id, title, description
+    │   │   ├── tags (array)
+    │   │   ├── format, date_created
+    │   │   ├── file_url, text_content
+    │   │   └── submitter info
+    │   │
+    │   └── pending_artifacts           # Awaiting review
+    │       └── (same schema)
     │
-    └─→ admin.html (Admin Login)
-            ↓
-        (review & accept)
-            ↓
-        (appears on index.html)
+    └── Storage Buckets:
+        └── artifacts/                  # File uploads
+            └── {uuid}/
+                ├── visual_{filename}
+                └── audio_{filename}
 ```
 
-## ⚙️ Key Features
+## Key Features by Component
 
-### Home Page
-- ✅ Interactive network graph visualization
-- ✅ Filter by categories and tags
-- ✅ Search functionality
-- ✅ Zoom controls
-- ✅ Click nodes to view details
+### 🎨 User Interface
+- **Intro Carousel**: 4-slide onboarding (welcome → finding → navigating → adding)
+- **Persona Modal**: Start button + 5 persona filters
+- **Help Modal**: Comprehensive guide (? button in navbar)
+- **Network/Timeline Views**: Toggle between force-directed and chronological
+- **Filter System**: Personas, categories, tags, search
 
-### Submit Page
-- ✅ Upload images, PDFs, or audio
-- ✅ Text input support
-- ✅ AI-powered tag suggestions (Google Gemini API)
-- ✅ Manual tag selection
-- ✅ Custom tag creation
-- ✅ Detailed artifact information form
+### 🤖 AI Integration
+- Google Gemini API for tag suggestions
+- Rate limiting (3 seconds between calls)
+- Graceful error handling
+- Manual tag fallback
 
-### Admin Page
-- ✅ Secure login system
-- ✅ Review queue with pending artifacts
-- ✅ Accept/reject functionality
-- ✅ View full artifact details
-- ✅ Session-based authentication
+### 📊 Data Visualization
+- D3.js force-directed graph
+- 6 category colors
+- Node hover tooltips
+- Timeline layout mode
+- Zoom controls
 
-## 🛠️ Customization Tips
+### 💾 Data Management
+- Supabase backend
+- Real-time artifact storage
+- File upload to cloud storage
+- Pending/accepted workflow
 
-### Change Colors
-Edit color values in `styles.css`:
-```css
-.btn {
-  background: #4a5268; /* Change this */
-}
-```
+### 🎯 User Flows
+1. **First Visit**: Carousel → Persona → Archive
+2. **Returning Visit**: Direct to archive (saved persona)
+3. **Submit**: User info → Upload → AI tags → Describe → Review
+4. **Admin**: Login → Review queue → Accept/Reject
 
-### Add More Tag Categories
-Edit the `tagCategories` object in `submit.js`:
-```javascript
-const tagCategories = {
-  newCategory: ['Tag 1', 'Tag 2', ...],
-  // ...
-}
-```
+## Technology Stack
+- **Frontend**: Vanilla JavaScript (ES6 modules)
+- **Visualization**: D3.js v7
+- **Database**: Supabase (PostgreSQL)
+- **Storage**: Supabase Storage
+- **AI**: Google Gemini API (gemini-2.0-flash-exp)
+- **Styling**: Custom CSS with Georgia & Roboto fonts
 
-### Modify Admin Credentials
-Edit in `admin.js`:
-```javascript
-const ADMIN_USERNAME = 'your_username';
-const ADMIN_PASSWORD = 'your_password';
-```
-
-## 📝 Important Notes
-
-- **API Key:** The Google Gemini API key in `submit.js` is exposed. For production, move it to a backend service.
-- **localStorage Limits:** Browser localStorage typically has a 5-10MB limit.
-- **File Size:** Large files (especially PDFs/audio) may hit storage limits.
-- **Browser Compatibility:** Requires modern browsers with localStorage and D3.js support.
-
-## 🐛 Troubleshooting
-
-**Graph not showing?**
-- Check browser console for errors
-- Ensure D3.js CDN is loading
-- Try clicking "load sample data" if no artifacts exist
-
-**Files not uploading?**
-- Check file size (localStorage limits)
-- Verify file type is supported
-- Clear browser cache and try again
-
-**Tags not saving?**
-- Ensure you've clicked tags to select them
-- Fill all required fields before submitting
-- Check browser console for JavaScript errors
-
-## 📱 Responsive Design
-
-All pages are responsive and work on:
-- Desktop (optimized)
-- Tablet (adjusted layouts)
-- Mobile (stacked layouts)
-
-## 🌐 Deployment
-
-### GitHub Pages
-1. Push all files to your repository
-2. Go to Settings → Pages
-3. Select branch and save
-4. Your site will be live at `https://yourusername.github.io/repo-name/`
-
-### Local Testing
-Simply open `index.html` in any modern browser - no server needed!
-
----
-
-**Need help?** Check the browser console (F12) for error messages.
+## Recent Updates
+- ✅ Intro carousel with skip functionality
+- ✅ Persona-based filtering
+- ✅ AI-powered tag generation
+- ✅ Timeline view with fixed node positions
+- ✅ Help modal with guide content
+- ✅ Rate limiting for API calls
+- ✅ Consistent modal sizing

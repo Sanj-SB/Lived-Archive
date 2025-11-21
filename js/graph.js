@@ -54,7 +54,7 @@ function showIntroCarousel() {
       // Slide 1: Welcome
       headerBg: '#9b87c4',
       headerText: 'Welcome to the Lived Archive!',
-      bodyText: 'Lived-Archive is a digital collection of artifacts dedicated to the Dalit media spaces, where users can be a part of it by sending in artifacts, being a part of the admin cycle, or simply interacting with the archive!',
+      bodyText: 'Lived Archive is a digital collection of artifacts dedicated to the Dalit media spaces, where users can be a part of it by sending in artifacts, being a part of the admin cycle, or simply interacting with the archive!',
       footerText: 'Coming up: Quick Start Guide'
     },
     {
@@ -937,7 +937,7 @@ function setupFilters(nodes) {
     personaHeader.style.margin = '8px 0';
     personaHeader.style.padding = '6px 4px';
     const label = document.createElement('span');
-    label.textContent = 'Personas';
+    label.textContent = 'Spaces';
     const chevron = document.createElement('span');
     chevron.id = 'personaChevron';
     chevron.textContent = '▸';
