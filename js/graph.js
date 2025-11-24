@@ -662,12 +662,12 @@ function initializeGraph(nodes, links) {
   
   g = svg.append('g');
   
-  // Create force simulation
+  // Create force simulation with increased spacing
   simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id).distance(160).strength(0.5))
-    .force('charge', d3.forceManyBody().strength(-40))
+    .force('link', d3.forceLink(links).id(d => d.id).distance(250).strength(0.3))
+    .force('charge', d3.forceManyBody().strength(-300))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collision', d3.forceCollide().radius(30))
+    .force('collision', d3.forceCollide().radius(50))
     .alphaDecay(0.01);
 
   // Draw links
