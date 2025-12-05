@@ -131,12 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fetch artifacts from Supabase and populate local state
   (async () => {
     try {
+      console.log('🔍 Starting to fetch artifacts from Supabase...');
+      
       // Expose supabase on window for other modules that expect it
       window.supabase = supabase;
 
       const { data: acceptedRows, error: accErr } = await supabase.from('accepted_artifacts').select('*').order('timestamp', { ascending: false });
-      if (accErr) console.error('Error fetching accepted_artifacts:', accErr);
-      else if (acceptedRows) {
+      
+      console.log('📊 Supabase response:', { acceptedRows, error: accErr });
+      
+      if (accErr) {
+        console.error('❌ Error fetching accepted_artifacts:', accErr);
+      } else if (acceptedRows) {
+        console.log(`✅ Found ${acceptedRows.length} accepted artifacts`);
+        
         // Map Supabase rows, convert file_url to public URL if present
         const supabaseArtifacts = acceptedRows.map((r) => {
           let publicFileUrl = r.file_url;
@@ -150,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: r.title,
             tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
             timestamp: r.timestamp,
-            date_created: r.date_created || null, // User-entered creation date from Supabase
+            date_created: r.date_created || null,
             format: r.format,
             textContent: r.text_content || null,
             description: r.description || '',
@@ -164,8 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           };
         });
+        
+        console.log('🎨 Mapped artifacts:', supabaseArtifacts);
+        
         // Merge pre-loaded sample artifacts with Supabase artifacts
-        acceptedArtifacts = [...supabaseArtifacts, ...acceptedArtifacts];
+        acceptedArtifacts = [...supabaseArtifacts];
+        
+        console.log('📦 Final acceptedArtifacts array:', acceptedArtifacts);
       }
 
       const { data: pendingRows, error: pendErr } = await supabase.from('pending_artifacts').select('*').order('timestamp', { ascending: false });
@@ -185,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: r.title,
             tags: Array.isArray(r.tags) ? r.tags : (r.tags ? JSON.parse(r.tags) : []),
             timestamp: r.timestamp,
-            date_created: r.date_created || null, // User-entered creation date from Supabase
+            date_created: r.date_created || null,
             description: r.description || '',
             format: r.format || '',
             textContent: r.text_content || '',
@@ -201,16 +214,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      console.log('🚀 About to call loadArchive with', acceptedArtifacts.length, 'artifacts');
+      
       // After fetching, load the graph and update review queue
       loadArchive(acceptedArtifacts);
+      
+      console.log('✅ loadArchive called successfully');
+      
       // Now initialize admin so review queue is populated
       if (typeof window.initializeAdmin === 'function') {
         window.initializeAdmin();
       }
       try { loadReviewQueue(pendingArtifacts); } catch (e) { /* ignore if admin UI not present */ }
     } catch (err) {
-      console.error('Error initializing data from Supabase:', err);
+      console.error('❌ Error initializing data from Supabase:', err);
       // Fallback: load local accepted artifacts
+      console.log('⚠️ Falling back to empty array');
       loadArchive(acceptedArtifacts);
     }
   })();

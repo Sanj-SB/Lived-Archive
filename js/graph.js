@@ -1284,5 +1284,18 @@ document.addEventListener('DOMContentLoaded', () => {
     window.personaTags = window.personaTagsMap[savedPersona] || [];
   }
   
-  loadArchive();
+  // Wait for getAcceptedArtifacts to be available from app.js
+  console.log('🔍 Checking if getAcceptedArtifacts is available...');
+  
+  const tryLoadArchive = () => {
+    if (typeof window.getAcceptedArtifacts === 'function') {
+      console.log('✅ getAcceptedArtifacts found, loading archive...');
+      loadArchive();
+    } else {
+      console.log('⏳ Waiting for app.js to load...');
+      setTimeout(tryLoadArchive, 100);
+    }
+  };
+  
+  tryLoadArchive();
 });
