@@ -1269,33 +1269,16 @@ export function loadArchive() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  const hasSeenIntro = localStorage.getItem('hasSeenIntro');
   const savedPersona = localStorage.getItem('selectedPersona');
-  
-  if (!hasSeenIntro && !savedPersona) {
-    // First time visitor - show full carousel
-    showIntroCarousel();
-  } else if (!savedPersona) {
-    // Has seen intro but no persona selected - skip to persona modal
-    showPersonaModal();
-  } else {
-    // Returning visitor with saved persona
+
+  // Always show the intro carousel on every page load
+  showIntroCarousel();
+
+  // Keep saved persona for filters if present
+  if (savedPersona) {
     window.selectedPersona = savedPersona;
     window.personaTags = window.personaTagsMap[savedPersona] || [];
   }
-  
-  // Wait for getAcceptedArtifacts to be available from app.js
-  console.log('🔍 Checking if getAcceptedArtifacts is available...');
-  
-  const tryLoadArchive = () => {
-    if (typeof window.getAcceptedArtifacts === 'function') {
-      console.log('✅ getAcceptedArtifacts found, loading archive...');
-      loadArchive();
-    } else {
-      console.log('⏳ Waiting for app.js to load...');
-      setTimeout(tryLoadArchive, 100);
-    }
-  };
-  
-  tryLoadArchive();
+
+  loadArchive();
 });
